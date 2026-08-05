@@ -21,10 +21,11 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: [true, "Password is required"],
       minlength: 8,
       select: false,
+      sparse: true, // For Google OAuth users without passwords
     },
+
     phone: {
       type: String,
       unique: true,
@@ -46,15 +47,43 @@ const userSchema = new mongoose.Schema(
         trim: true,
       },
     },
+
+    // Google OAuth fields
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    avatar: {
+      type: String,
+      default: null,
+    },
+
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-// Hash password before saving
+// Hash password before saving (only for local auth)
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
+    return;
+  }
+
+  // Skip if no password (Google OAuth users)
+  if (!this.password) {
     return;
   }
 
@@ -64,6 +93,11 @@ userSchema.pre("save", async function () {
 // Compare password during login
 userSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.password);
+};
+
+// Instance method to check if user can login with password
+userSchema.methods.canLoginWithPassword = function () {
+  return this.authProvider === "local" && this.password;
 };
 
 export const userModel = mongoose.model("User", userSchema);
