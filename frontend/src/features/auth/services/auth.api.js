@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "https://bookswap-jpsw.onrender.com",
   withCredentials: true,
 });
 
@@ -45,7 +45,5 @@ export const getme = async () => {
 };
 
 export const googleLogin = () => {
-  window.location.href = `${
-    import.meta.env.VITE_API_URL
-  }/api/auth/google`;
+  window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
 };
