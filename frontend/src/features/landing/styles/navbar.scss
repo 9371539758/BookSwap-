@@ -1,0 +1,217 @@
+// ─── NAVBAR STYLES ────────────────────────────────────────────────────────────
+// Fixed at top, hides on scroll-down, shows on scroll-up.
+// Uses glassmorphism effect on scroll.
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+$accent:       #6c63ff;
+$bg-dark:      #0f0f0f;
+$text-primary: #f0f0f0;
+$text-muted:   #888;
+$border:       rgba(255, 255, 255, 0.08);
+
+// ── Base Navbar ────────────────────────────────────────────────────────────────
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(15, 15, 15, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid $border;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s ease;
+
+  // Hide when scrolling down
+  &--hidden {
+    transform: translateY(-100%);
+  }
+
+  // Extra shadow when user has scrolled
+  &--scrolled {
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    background: rgba(15, 15, 15, 0.9);
+  }
+}
+
+// ── Inner container ────────────────────────────────────────────────────────────
+.navbar__container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+// ── Logo ───────────────────────────────────────────────────────────────────────
+.navbar__logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  &:hover .navbar__logo-text {
+    color: $accent;
+  }
+
+  .navbar__logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .navbar__logo-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: -0.3px;
+    transition: color 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+// ── Nav Links ──────────────────────────────────────────────────────────────────
+.navbar__menu {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    display: none; // hide on mobile for now
+  }
+}
+
+.navbar__item {
+  .navbar__link {
+    padding: 0.4rem 0.85rem;
+    color: $text-muted;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+    font-family: 'Inter', sans-serif;
+
+    &:hover {
+      color: $text-primary;
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
+}
+
+// ── Auth Section ───────────────────────────────────────────────────────────────
+.navbar__auth {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+// ── User info (logged in) ──────────────────────────────────────────────────────
+.navbar__user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.25rem;
+}
+
+.navbar__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid $accent;
+}
+
+.navbar__avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, #9c88ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid rgba(108, 99, 255, 0.4);
+}
+
+.navbar__username {
+  font-size: 0.875rem;
+  color: $text-primary;
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+}
+
+// ── Buttons ────────────────────────────────────────────────────────────────────
+.navbar__btn {
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+
+  // Login button — ghost style
+  &--login {
+    background: transparent;
+    color: $text-muted;
+    border: 1px solid $border;
+
+    &:hover {
+      color: $text-primary;
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+    }
+  }
+
+  // Sign Up button — filled accent
+  &--signup {
+    background: linear-gradient(135deg, $accent, #9c88ff);
+    color: #fff;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.4);
+    }
+  }
+
+  // Secondary actions (List Book, My Books)
+  &--secondary {
+    background: rgba(255,255,255,0.06);
+    color: $text-primary;
+    border: 1px solid $border;
+
+    &:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+  }
+
+  // Logout — red tinted
+  &--logout {
+    background: rgba(255, 80, 80, 0.1);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 80, 80, 0.2);
+
+    &:hover {
+      background: rgba(255, 80, 80, 0.2);
+    }
+  }
+}
