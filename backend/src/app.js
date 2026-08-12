@@ -21,12 +21,9 @@ app.use(cookieParser());
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 // Allows any localhost port (Vite picks 5173, 5174... depending on availability)
 // In production, set CLIENT_URL in .env to your actual domain.
-import cors from "cors";
-
 const allowedOrigins = [
   "http://localhost:5173",
   "https://book-swap-blond.vercel.app",
-  "https://book-swap-pmyl1sabc-9371539758s-projects.vercel.app",
 ];
 
 app.use(
