@@ -20,7 +20,10 @@ export const googleAuthCallback = async (req, res) => {
 
     res.cookie("token", token, cookieOptions);
 
-    const clientURL = process.env.CLIENT_URL || "http://localhost:5173";
+    const clientURL =
+      process.env.CLIENT_URL ||
+      process.env.FRONTEND_URL ||
+      "http://localhost:5173";
     res.redirect(`${clientURL}/auth/success`);
   } catch (error) {
     res.status(500).json({
