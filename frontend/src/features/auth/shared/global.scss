@@ -1,0 +1,94 @@
+// ─── GLOBAL STYLES ────────────────────────────────────────────────────────────
+// Base reset and global CSS variables for the entire app.
+// Dark mode by default (BookSwap dark theme).
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
+
+// ── CSS Variables ──────────────────────────────────────────────────────────────
+:root {
+  --font:          'Inter', sans-serif;
+  --font-serif:    'Playfair Display', serif;
+
+  // Colors
+  --bg:            #0f0f0f;
+  --bg-card:       #1a1a1a;
+  --accent:        #6c63ff;
+  --accent-hover:  #574fd6;
+
+  // Text
+  --text-primary:  #f0f0f0;
+  --text-muted:    #888;
+
+  // Borders
+  --border:        rgba(255, 255, 255, 0.08);
+
+  // Shadows
+  --shadow-sm:     0 4px 20px rgba(0, 0, 0, 0.2);
+  --shadow-md:     0 8px 40px rgba(0, 0, 0, 0.4);
+  --shadow-accent: 0 8px 25px rgba(108, 99, 255, 0.4);
+}
+
+// ── Reset ──────────────────────────────────────────────────────────────────────
+// Remove browser default margins/padding, use border-box everywhere
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+// ── Base ───────────────────────────────────────────────────────────────────────
+html {
+  scroll-behavior: smooth; // smooth scroll for anchor links (#features, #how-it-works)
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+// ── Links & Buttons Reset ──────────────────────────────────────────────────────
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+
+// ── Scrollbar (webkit) ─────────────────────────────────────────────────────────
+// Custom scrollbar to match dark theme
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(108, 99, 255, 0.4);
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(108, 99, 255, 0.7);
+  }
+}
+
+// ── Selection color ────────────────────────────────────────────────────────────
+::selection {
+  background: rgba(108, 99, 255, 0.3);
+  color: #fff;
+}
