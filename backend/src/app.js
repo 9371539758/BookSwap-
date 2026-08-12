@@ -21,19 +21,23 @@ app.use(cookieParser());
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 // Allows any localhost port (Vite picks 5173, 5174... depending on availability)
 // In production, set CLIENT_URL in .env to your actual domain.
+import cors from "cors";
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://book-swap-pmyl1sabc-9371539758s-projects.vercel.app",
+];
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, curl, server-to-server)
-      if (!origin) return callback(null, true);
-      // Allow any localhost port for development
-      if (origin.startsWith("http://localhost")) return callback(null, true);
-      // Allow the configured production URL
-      if (origin === process.env.CLIENT_URL) return callback(null, true);
-      // Block everything else
-      callback(new Error("Not allowed by CORS"));
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    credentials: true, // REQUIRED: allows cookies to be sent cross-origin
+    credentials: true,
   })
 );
 
