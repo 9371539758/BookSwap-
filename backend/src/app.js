@@ -25,18 +25,13 @@ import cors from "cors";
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://book-swap-blond.vercel.app/",
+  "https://book-swap-blond.vercel.app",
+  "https://book-swap-pmyl1sabc-9371539758s-projects.vercel.app",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );
