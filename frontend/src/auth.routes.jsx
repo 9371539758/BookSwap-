@@ -5,6 +5,7 @@ import Navbar from "./features/landing/components/Navbar";
 // ─── Page Imports ─────────────────────────────────────────────────────────────
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
+import AuthSuccess from "./features/auth/pages/AuthSuccess";
 import Landing from "./features/landing/pages/Landing";
 import AddBook from "./features/book/pages/AddBook";
 import MyBooks from "./features/book/pages/MyBooks";
@@ -67,6 +68,8 @@ const ProtectedLayout = () => {
 //  /my-books → ProtectedLayout (with navbar) → MyBooks page
 
 const router = createBrowserRouter([
+  { path: "/auth/success", element: <AuthSuccess /> },
+
   // ── Auth routes — no navbar, redirect if already logged in ──
   {
     element: <AuthLayout />,

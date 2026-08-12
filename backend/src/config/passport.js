@@ -13,23 +13,40 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback",
+        callbackURL:
+          process.env.GOOGLE_CALLBACK_URL ||
+          "http://localhost:3000/api/auth/google/callback",
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          // Check if user already registered with Google
-          let user = await userModel.findOne({ googleId: profile.id });
+          const email = profile.emails?.[0]?.value?.toLowerCase();
+          const googleId = profile.id;
 
+          // First try to find an existing Google-linked user
+          let user = await userModel.findOne({ googleId });
           if (user) {
-            return done(null, user); // existing user — log them in
+            return done(null, user);
+          }
+
+          // If the user already exists by email, link the Google account
+          if (email) {
+            user = await userModel.findOne({ email });
+            if (user) {
+              user.googleId = googleId;
+              user.authProvider = "google";
+              user.isVerified = true;
+              user.avatar = user.avatar || profile.photos[0]?.value || null;
+              await user.save();
+              return done(null, user);
+            }
           }
 
           // New Google user — create account automatically
           user = await userModel.create({
-            googleId: profile.id,
+            googleId,
             username: profile.emails[0].value.split("@")[0], // email prefix as username
             fullName: profile.displayName,
-            email: profile.emails[0].value,
+            email,
             avatar: profile.photos[0]?.value || null,
             authProvider: "google",
             isVerified: true,
@@ -39,8 +56,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         } catch (error) {
           return done(error, null);
         }
-      }
-    )
+      },
+    ),
   );
 
   // Serialize: store only user ID in session
