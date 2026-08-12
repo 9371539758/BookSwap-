@@ -25,7 +25,7 @@ import cors from "cors";
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://book-swap-pmyl1sabc-9371539758s-projects.vercel.app",
+  "https://book-swap-blond.vercel.app/",
 ];
 
 app.use(
