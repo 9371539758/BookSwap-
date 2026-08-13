@@ -36,8 +36,11 @@ const allowedOrigins = [
   // Local development
   "http://localhost:5173",
 
-  // Production frontend deployed on Vercel
+  // Production frontend deployed on Vercel (custom domain)
   "https://book-swap-blond.vercel.app",
+
+  // Vercel preview deployments (allow all .vercel.app domains)
+  /https:\/\/book-swap-.*\.vercel\.app$/,
 ];
 
 // Enable CORS
