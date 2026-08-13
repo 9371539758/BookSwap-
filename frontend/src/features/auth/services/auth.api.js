@@ -1,7 +1,14 @@
 import axios from "axios";
 
+// Determine API URL based on environment
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.MODE === "production"
+    ? "https://bookswap-jpsw.onrender.com"
+    : "http://localhost:5000");
+
 const api = axios.create({
-  baseURL: "https://bookswap-jpsw.onrender.com",
+  baseURL: API_URL,
   withCredentials: true,
 });
 
@@ -45,5 +52,5 @@ export const getme = async () => {
 };
 
 export const googleLogin = () => {
-  window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+  window.location.href = `${API_URL}/api/auth/google`;
 };
