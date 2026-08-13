@@ -1,56 +1,54 @@
-// ─── AUTH SHARED STYLES ────────────────────────────────────────────────────────
-// Used by both Login and Register pages.
-// Design: Split screen — left brand panel, right form panel.
-// Color palette: Dark base (#0f0f0f), accent (#6c63ff purple), warm white text.
+// ─── AUTH SHARED STYLES (Mobile Optimized) ───────────────────────────────────
+// Left = clear image | Right = blurred image + form
+// Fully responsive
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-// ── Variables ──────────────────────────────────────────────────────────────────
+// Import the background image (correct path for your structure)
+$auth-bg: url('/images/home.jpg');
+
+// Variables
 $bg-dark:       #0f0f0f;
-$bg-card:       #1a1a1a;
-$accent:        #6c63ff;
-$accent-hover:  #574fd6;
 $text-primary:  #f0f0f0;
 $text-muted:    #888;
-$border:        rgba(255, 255, 255, 0.08);
+$accent:        #6c63ff;
 $error-bg:      rgba(255, 80, 80, 0.12);
 $error-color:   #ff6b6b;
-$success:       #4ade80;
 
-// ── Page Layout ────────────────────────────────────────────────────────────────
+// ── Page Layout ──────────────────────────────────────────────────────────────
 .auth-page {
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh; // better on mobile browsers
   font-family: 'Inter', sans-serif;
-  background: $bg-dark;
+  background-color: $bg-dark;
+  background-image: $auth-bg;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
-// ── Left Brand Panel ────────────────────────────────────────────────────────────
+// ── Left Brand Panel ─────────────────────────────────────────────────────────
 .auth-brand-panel {
   flex: 1;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
 
-  // Ambient glow circle
   &::before {
     content: '';
     position: absolute;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(108, 99, 255, 0.3) 0%, transparent 70%);
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
+    pointer-events: none;
   }
 
-  // Hide on mobile
-  @media (max-width: 768px) {
+  // Hide completely on mobile & tablet
+  @media (max-width: 900px) {
     display: none;
   }
 }
@@ -60,6 +58,7 @@ $success:       #4ade80;
   z-index: 1;
   text-align: center;
   padding: 2rem;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 
   .auth-brand-logo {
     font-size: 4rem;
@@ -72,42 +71,14 @@ $success:       #4ade80;
     font-weight: 700;
     color: #fff;
     margin: 0 0 0.5rem;
-    letter-spacing: -0.5px;
   }
 
   .auth-brand-tagline {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255, 255, 255, 0.85);
     font-size: 1rem;
     margin: 0 0 2.5rem;
   }
 
-  // Stats row (Login page)
-  .auth-brand-stats {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-  }
-
-  .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-
-    .stat-number {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: $accent;
-    }
-    .stat-label {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.5);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-  }
-
-  // Features list (Register page)
   .auth-brand-features {
     display: flex;
     flex-direction: column;
@@ -115,78 +86,103 @@ $success:       #4ade80;
     text-align: left;
 
     .feature-item {
-      color: rgba(255,255,255,0.8);
+      color: rgba(255, 255, 255, 0.9);
       font-size: 0.95rem;
-      padding: 0.5rem 1rem;
-      background: rgba(108, 99, 255, 0.1);
+      padding: 0.55rem 1rem;
+      background: rgba(0, 0, 0, 0.4);
       border-radius: 8px;
       border-left: 3px solid $accent;
+      backdrop-filter: blur(6px);
     }
   }
 }
 
-// ── Right Form Panel ────────────────────────────────────────────────────────────
+// ── Right Form Panel ─────────────────────────────────────────────────────────
 .auth-panel {
-  width: 500px;
-  min-width: 380px;
-  background: $bg-card;
+  width: 460px;
+  min-width: 340px;
+  background: rgba(12, 12, 12, 0.58);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2.5rem 2rem;
   overflow-y: auto;
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
 
-  @media (max-width: 768px) {
+  // Mobile & Tablet
+  @media (max-width: 900px) {
     width: 100%;
     min-width: unset;
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.4rem;
+    background: rgba(10, 10, 10, 0.78);
+    border-left: none;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1.6rem 1.15rem;
   }
 }
 
 .auth-form-inner {
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
 }
 
 .auth-heading {
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 700;
-  color: $text-primary;
-  margin: 0 0 0.4rem;
+  color: #fff;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.3px;
+
+  @media (max-width: 480px) {
+    font-size: 1.7rem;
+  }
 }
 
 .auth-subtext {
-  color: $text-muted;
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.9rem;
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.6rem;
+
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+    margin-bottom: 1.4rem;
+  }
 }
 
-// ── Error Box ──────────────────────────────────────────────────────────────────
+// ── Error ────────────────────────────────────────────────────────────────────
 .auth-error {
   background: $error-bg;
   border: 1px solid rgba(255, 80, 80, 0.3);
   border-radius: 10px;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   color: $error-color;
   font-size: 0.875rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.2rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-// ── Google Button ──────────────────────────────────────────────────────────────
+// ── Google Button ────────────────────────────────────────────────────────────
 .google-btn {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1.5rem;
+  gap: 0.7rem;
+  padding: 0.85rem 1.4rem;
   background: #fff;
-  color: #333;
+  color: #222;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -194,8 +190,7 @@ $success:       #4ade80;
   font-family: 'Inter', sans-serif;
 
   &:hover {
-    background: #f5f5f5;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    background: #f4f4f4;
     transform: translateY(-1px);
   }
 
@@ -204,11 +199,11 @@ $success:       #4ade80;
   }
 }
 
-// ── Divider ────────────────────────────────────────────────────────────────────
+// ── Divider ──────────────────────────────────────────────────────────────────
 .auth-divider {
   position: relative;
   text-align: center;
-  margin: 1.25rem 0;
+  margin: 1.35rem 0;
 
   &::before {
     content: '';
@@ -217,132 +212,149 @@ $success:       #4ade80;
     left: 0;
     right: 0;
     height: 1px;
-    background: $border;
+    background: rgba(255, 255, 255, 0.12);
   }
 
   span {
     position: relative;
-    background: $bg-card;
-    padding: 0 0.75rem;
-    color: $text-muted;
+    padding: 0 0.8rem;
+    color: rgba(255, 255, 255, 0.45);
     font-size: 0.8rem;
+    background: rgba(12, 12, 12, 0.7);
   }
 }
 
-// ── Form Fields ────────────────────────────────────────────────────────────────
-// Two-column row for username+fullName and phone+location
+// ── Form Fields ──────────────────────────────────────────────────────────────
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.9rem;
+
+  // Stack on mobile
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 
 .field {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 
   label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
-    color: $text-primary;
+    color: rgba(255, 255, 255, 0.7);
     margin-bottom: 0.4rem;
 
     .optional {
-      color: $text-muted;
+      color: rgba(255, 255, 255, 0.4);
       font-weight: 400;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
     }
   }
 
   input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid $border;
-    border-radius: 10px;
-    color: $text-primary;
-    font-size: 0.9rem;
+    padding: 0.7rem 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.22);
+    border-radius: 0;
+    color: #fff;
+    font-size: 0.95rem;
     font-family: 'Inter', sans-serif;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s;
     box-sizing: border-box;
+    -webkit-appearance: none; // remove iOS default styles
 
     &::placeholder {
-      color: rgba(255,255,255,0.2);
+      color: rgba(255, 255, 255, 0.32);
     }
 
     &:focus {
       outline: none;
-      border-color: $accent;
-      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
-      background: rgba(255,255,255,0.06);
+      border-bottom-color: #fff;
     }
   }
 }
 
-// ── Password field with toggle button ──────────────────────────────────────────
+// Password toggle
 .password-wrapper {
   position: relative;
 
   input {
-    padding-right: 3rem; // space for the toggle button
+    padding-right: 2.4rem;
   }
 
   .password-toggle {
     position: absolute;
-    right: 0.75rem;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1rem;
-    color: $text-muted;
-    padding: 0;
+    font-size: 1.05rem;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 0.3rem;
     line-height: 1;
 
     &:hover {
-      color: $text-primary;
+      color: #fff;
     }
   }
 }
 
-// ── Forgot password row ─────────────────────────────────────────────────────────
+// Remember / Forgot row
 .auth-row {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.25rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.4rem;
+  margin-top: -0.15rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 
   .forgot {
-    font-size: 0.83rem;
-    color: $accent;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.6);
     cursor: pointer;
-    transition: color 0.2s;
 
     &:hover {
-      color: lighten($accent, 15%);
+      color: #fff;
       text-decoration: underline;
     }
   }
 }
 
-// ── Submit Button ──────────────────────────────────────────────────────────────
+// ── Black Button (like screenshot) ───────────────────────────────────────────
 .auth-btn {
   width: 100%;
-  padding: 0.9rem;
-  background: linear-gradient(135deg, $accent, #9c88ff);
+  padding: 0.95rem;
+  background: #111;
   color: #fff;
-  border: none;
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
+  letter-spacing: 0.2px;
+
+  // Better touch target on mobile
+  @media (max-width: 480px) {
+    padding: 1.05rem;
+    font-size: 1.02rem;
+  }
 
   &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+    background: #000;
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
   }
 
   &:active:not(:disabled) {
@@ -350,12 +362,11 @@ $success:       #4ade80;
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 }
 
-// Loading state inside button
 .btn-loading {
   display: flex;
   align-items: center;
@@ -364,36 +375,38 @@ $success:       #4ade80;
 }
 
 .spinner {
-  display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
-// ── Footer link ─────────────────────────────────────────────────────────────────
+// ── Footer ───────────────────────────────────────────────────────────────────
 .auth-footer {
   text-align: center;
-  color: $text-muted;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.875rem;
-  margin-top: 1.5rem;
+  margin-top: 1.7rem;
 
   span {
-    color: $accent;
+    color: #fff;
     cursor: pointer;
     font-weight: 500;
-    transition: color 0.2s;
 
     &:hover {
-      color: lighten($accent, 15%);
       text-decoration: underline;
     }
   }
+
+  @media (max-width: 480px) {
+    font-size: 0.84rem;
+    margin-top: 1.5rem;
+  }
 }
 
-// ── Animations ─────────────────────────────────────────────────────────────────
+// ── Animations ───────────────────────────────────────────────────────────────
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }

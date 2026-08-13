@@ -74,7 +74,7 @@ const Register = () => {
       {/* Left decorative panel */}
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
-          <div className="auth-brand-logo">📚</div>
+          {/* <div className="auth-brand-logo">📚</div> */}
           <h2 className="auth-brand-title">BookSwap</h2>
           <p className="auth-brand-tagline">Join thousands of readers today</p>
           <div className="auth-brand-features">
