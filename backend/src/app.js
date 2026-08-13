@@ -11,7 +11,7 @@ import "./config/passport.js";
 // Import authentication routes
 import googleAuthRoutes from "./routes/googleAuth.routes.js";
 import authRoutes from "./routes/auth.routes.js";
-
+import bookRoutes from "./routes/book.routes.js";
 const app = express();
 
 /* ============================================================
@@ -25,7 +25,6 @@ app.use(express.json());
 // Read cookies sent by the browser
 // Required for JWT authentication stored in HTTP-only cookies
 app.use(cookieParser());
-
 
 /* ============================================================
    CORS CONFIGURATION
@@ -51,9 +50,8 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
-  })
+  }),
 );
-
 
 /* ============================================================
    EXPRESS SESSION
@@ -66,9 +64,7 @@ app.use(
 app.use(
   session({
     // Secret used to sign the session ID
-    secret:
-      process.env.SESSION_SECRET ||
-      "bookswap_session_secret_key",
+    secret: process.env.SESSION_SECRET || "bookswap_session_secret_key",
 
     // Don't save the session if nothing has changed
     resave: false,
@@ -86,9 +82,8 @@ app.use(
       // Session expires after 24 hours
       maxAge: 24 * 60 * 60 * 1000,
     },
-  })
+  }),
 );
-
 
 /* ============================================================
    PASSPORT CONFIGURATION
@@ -101,7 +96,6 @@ app.use(passport.initialize());
 // Required for Google OAuth session handling
 app.use(passport.session());
 
-
 /* ============================================================
    AUTHENTICATION ROUTES
    ============================================================ */
@@ -112,7 +106,6 @@ app.use(passport.session());
 // GET /api/auth/google/callback
 app.use("/api/auth", googleAuthRoutes);
 
-
 // Normal authentication routes
 //
 // POST /api/auth/register
@@ -120,7 +113,6 @@ app.use("/api/auth", googleAuthRoutes);
 // POST /api/auth/logout
 // GET  /api/auth/getme
 app.use("/api/auth", authRoutes);
-
 
 /* ============================================================
    HEALTH CHECK
@@ -136,13 +128,26 @@ app.use("/api/auth", authRoutes);
 //   success: true,
 //   message: "BookSwap API is running"
 // }
+
+/* ============================================================
+   BOOK ROUTES
+   ============================================================ */
+
+// Book management routes
+//
+// POST   /api/books        - Add a new book (requires login)
+// GET    /api/books        - List all books
+// GET    /api/books/:id    - Get one book
+// PUT    /api/books/:id    - Update a book (owner only)
+// DELETE /api/books/:id    - Delete a book (owner only)
+app.use("/api/books", bookRoutes);
+
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "BookSwap API is running",
   });
 });
-
 
 /* ============================================================
    EXPORT APP
