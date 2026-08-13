@@ -39,6 +39,7 @@ app.use(
       const allowedOrigins = [
         "http://localhost:5173",
         "https://book-swap-blond.vercel.app",
+        "https://book-swap-puce.vercel.app",
       ];
 
       // Allow requests with no origin (like mobile apps or server-to-server)
