@@ -4,8 +4,8 @@ import axios from "axios";
 const API_URL =
   import.meta.env.VITE_API_URL ||
   (import.meta.env.MODE === "production"
-    ? "https://bookswap-jpsw.onrender.com"
-    : "http://localhost:5000");
+    ? "https://bookswap-backend-vvkg.onrender.com"
+    : "http://localhost:3000");
 
 const api = axios.create({
   baseURL: API_URL,

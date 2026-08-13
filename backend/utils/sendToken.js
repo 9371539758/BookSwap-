@@ -17,7 +17,7 @@ export const sendToken = (user, statusCode, res) => {
   const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
   };
 
@@ -27,7 +27,10 @@ export const sendToken = (user, statusCode, res) => {
     .cookie("token", token, cookieOptions)
     .json({
       success: true,
-      message: statusCode === 201 ? "Account created successfully" : "Logged in successfully",
+      message:
+        statusCode === 201
+          ? "Account created successfully"
+          : "Logged in successfully",
       user: {
         id: user._id,
         username: user.username,

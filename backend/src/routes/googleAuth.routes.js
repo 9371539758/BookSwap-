@@ -12,18 +12,21 @@ const router = express.Router();
 const googleNotConfigured = (req, res) => {
   res.status(501).json({
     success: false,
-    message: "Google OAuth is not configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env",
+    message:
+      "Google OAuth is not configured. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env",
   });
 };
 
-const isGoogleConfigured = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const isGoogleConfigured = !!(
+  process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+);
 
 // GET /api/auth/google — start Google OAuth flow
 router.get(
   "/google",
   isGoogleConfigured
     ? passport.authenticate("google", { scope: ["profile", "email"] })
-    : googleNotConfigured
+    : googleNotConfigured,
 );
 
 // GET /api/auth/google/callback — Google redirects here after user approves
@@ -31,11 +34,17 @@ router.get(
   "/google/callback",
   isGoogleConfigured
     ? passport.authenticate("google", {
-        failureRedirect: `${process.env.CLIENT_URL || "http://localhost:5173"}/login?error=auth_failed`,
+        failureRedirect: `${
+          process.env.CLIENT_URL ||
+          process.env.FRONTEND_URL ||
+          "https://book-swap-blond.vercel.app"
+        }/login?error=auth_failed`,
         session: false,
       })
     : googleNotConfigured,
-  isGoogleConfigured ? googleAuthController.googleAuthCallback : googleNotConfigured
+  isGoogleConfigured
+    ? googleAuthController.googleAuthCallback
+    : googleNotConfigured,
 );
 
 // GET /api/auth/me — get current logged in user (used by Google auth flow)

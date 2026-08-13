@@ -35,29 +35,30 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: function (origin, callback) {
-      // List of allowed origins
       const allowedOrigins = [
         "http://localhost:5173",
+        "http://localhost:5174",
         "https://book-swap-blond.vercel.app",
         "https://book-swap-puce.vercel.app",
-      ];
+        "https://bookswap-frontend-4ayc.onrender.com",
+        "https://bookswap-backend-vvkg.onrender.com",
+        process.env.CLIENT_URL,
+        process.env.FRONTEND_URL,
+      ].filter(Boolean);
 
-      // Allow requests with no origin (like mobile apps or server-to-server)
       if (!origin) {
         return callback(null, true);
       }
 
-      // Check if origin matches exactly
-      if (allowedOrigins.includes(origin)) {
+      const isAllowed =
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.endsWith(".onrender.com");
+
+      if (isAllowed) {
         return callback(null, true);
       }
 
-      // Check if origin is a Vercel preview
-      if (origin.match(/https:\/\/book-swap-.*\.vercel\.app/)) {
-        return callback(null, true);
-      }
-
-      // If we reach here, origin is not allowed
       console.warn(`CORS blocked: ${origin}`);
       callback(new Error("CORS policy violation"));
     },
@@ -75,23 +76,13 @@ app.use(
 // JWT authentication for normal login is handled separately.
 app.use(
   session({
-    // Secret used to sign the session ID
     secret: process.env.SESSION_SECRET || "bookswap_session_secret_key",
-
-    // Don't save the session if nothing has changed
     resave: false,
-
-    // Don't create an empty session for every visitor
     saveUninitialized: false,
-
     cookie: {
-      // HTTPS is required for secure cookies in production
       secure: process.env.NODE_ENV === "production",
-
-      // Prevent JavaScript from accessing the cookie
       httpOnly: true,
-
-      // Session expires after 24 hours
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
     },
   }),
