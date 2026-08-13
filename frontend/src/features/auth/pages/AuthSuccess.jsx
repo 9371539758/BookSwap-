@@ -5,11 +5,7 @@ const AuthSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      navigate("/", { replace: true });
-    }, 1000);
-
-    return () => clearTimeout(timeout);
+    navigate("/", { replace: true });
   }, [navigate]);
 
   return (
