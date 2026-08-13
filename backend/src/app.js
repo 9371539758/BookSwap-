@@ -27,31 +27,39 @@ app.use(express.json());
 app.use(cookieParser());
 
 /* ============================================================
+/* ============================================================
    CORS CONFIGURATION
    ============================================================ */
 
-// List of frontend URLs that are allowed to communicate
-// with this backend.
-const allowedOrigins = [
-  // Local development
-  "http://localhost:5173",
-
-  // Production frontend deployed on Vercel (custom domain)
-  "https://book-swap-blond.vercel.app",
-
-  // Vercel preview deployments (allow all .vercel.app domains)
-  /https:\/\/book-swap-.*\.vercel\.app$/,
-];
-
-// Enable CORS
-//
-// credentials: true is required because our authentication
-// uses cookies.
-//
-// The origin must exactly match one of the allowed origins.
+// Enable CORS with dynamic origin check
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      // List of allowed origins
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://book-swap-blond.vercel.app",
+      ];
+
+      // Allow requests with no origin (like mobile apps or server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Check if origin matches exactly
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Check if origin is a Vercel preview
+      if (origin.match(/https:\/\/book-swap-.*\.vercel\.app/)) {
+        return callback(null, true);
+      }
+
+      // If we reach here, origin is not allowed
+      console.warn(`CORS blocked: ${origin}`);
+      callback(new Error("CORS policy violation"));
+    },
     credentials: true,
   }),
 );
