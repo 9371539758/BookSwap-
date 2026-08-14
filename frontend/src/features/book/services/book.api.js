@@ -29,9 +29,17 @@ export const getBooks = async () => {
 // GET /api/books/my — get only the current user's books
 // Protected route — requires valid JWT cookie
 export const getMyBooks = async () => {
-  const response = await api.get("/api/books/my");
-  // backend responds { success, count, data: [books] }
-  return response.data.data; // returns the array of books
+  try {
+    const response = await api.get("/api/books/my");
+    // backend responds { success, count, data: [books] }
+    return response.data.data; // returns the array of books
+  } catch (error) {
+    if (error.response?.status === 404) {
+      const legacyResponse = await api.get("/api/books/my-books");
+      return legacyResponse.data.data;
+    }
+    throw error;
+  }
 };
 
 // DELETE /api/books/:id — delete a book by ID
