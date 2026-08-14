@@ -1,8 +1,13 @@
 // ─── LANDING PAGE STYLES ──────────────────────────────────────────────────────
 // Dark premium design for BookSwap landing page.
-// Sections: hero, stats strip, features grid, how-it-works, CTA.
+// Background image + dark overlay (same feel as auth pages)
+// Fonts remain exactly the same.
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+
+// Background image (use the same one as auth, or change if you want)
+$landing-bg: url('../assets/bgImage.jpg');   // adjust path if needed
+// Alternative: url('../assets/homebg.jpg') or url('/images/home.jpg')
 
 $bg-dark:       #0f0f0f;
 $bg-card:       #1a1a1a;
@@ -10,33 +15,61 @@ $bg-card-hover: #222;
 $accent:        #6c63ff;
 $accent-hover:  #574fd6;
 $text-primary:  #f0f0f0;
-$text-muted:    #888;
+$text-muted:    #a0a0a0;
 $border:        rgba(255, 255, 255, 0.08);
 
 .landing {
-  background: $bg-dark;
+  background-color: $bg-dark;
+  background-image: $landing-bg;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;          // nice parallax feel on desktop
+  background-repeat: no-repeat;
   color: $text-primary;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
+  position: relative;
+
+  // Dark overlay so white text is always readable
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 8, 12, 0.72);   // adjust opacity if you want more/less image
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  // Make sure all content sits above the overlay
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  // Disable fixed background on mobile (better performance)
+  @media (max-width: 768px) {
+    background-attachment: scroll;
+  }
 }
 
 // ── HERO SECTION ──────────────────────────────────────────────────────────────
 .hero {
   min-height: 100vh;
-  padding-top: 65px; // account for fixed navbar height
+  min-height: 100dvh;
+  padding-top: 65px;
   display: flex;
   align-items: center;
   border-bottom: 1px solid $border;
   position: relative;
   overflow: hidden;
 
-  // Background radial glow
+  // Soft accent glow
   &::before {
     content: '';
     position: absolute;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(108, 99, 255, 0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(108, 99, 255, 0.15) 0%, transparent 70%);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -59,6 +92,12 @@ $border:        rgba(255, 255, 255, 0.08);
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
     text-align: center;
+    padding: 3rem 1.5rem;
+    gap: 2.5rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 2.5rem 1.2rem;
   }
 }
 
@@ -71,18 +110,24 @@ $border:        rgba(255, 255, 255, 0.08);
     margin: 0 0 1rem;
     font-weight: 600;
   }
+
   .hero__description {
     font-size: 1.1rem;
     font-weight: 600;
-    color: $text-primary;
+    color: #fff;
     margin: 0 0 1rem;
     line-height: 1.5;
   }
+
   .hero__mission {
     font-size: 0.875rem;
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.65);
     line-height: 1.8;
     margin: 0;
+  }
+
+  @media (max-width: 900px) {
+    order: 2;
   }
 }
 
@@ -91,26 +136,28 @@ $border:        rgba(255, 255, 255, 0.08);
 
   .hero__title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(3rem, 7vw, 6rem);
+    font-size: clamp(2.8rem, 7vw, 6rem);
     font-weight: 900;
     line-height: 0.95;
     margin: 0;
     letter-spacing: -2px;
-    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #fff; // solid white for better readability on image
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
   }
 
   .hero__welcome {
     margin-top: 1.5rem;
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 1rem;
 
     strong {
       color: $accent;
       font-weight: 600;
     }
+  }
+
+  @media (max-width: 900px) {
+    order: 1;
   }
 }
 
@@ -122,31 +169,37 @@ $border:        rgba(255, 255, 255, 0.08);
   @media (max-width: 900px) {
     flex-direction: row;
     justify-content: center;
+    flex-wrap: wrap;
+    order: 3;
   }
 }
 
 .showcase-item {
   .showcase-box {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid $border;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    transition: background 0.2s, transform 0.2s;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
 
     &:hover {
-      background: rgba(108, 99, 255, 0.08);
-      border-color: rgba(108, 99, 255, 0.3);
+      background: rgba(108, 99, 255, 0.15);
+      border-color: rgba(108, 99, 255, 0.35);
       transform: translateX(-4px);
     }
 
-    .showcase-icon { font-size: 1.5rem; }
+    .showcase-icon {
+      font-size: 1.5rem;
+    }
+
     .showcase-label {
       font-size: 0.875rem;
       font-weight: 500;
-      color: $text-muted;
+      color: rgba(255, 255, 255, 0.75);
     }
   }
 }
@@ -159,13 +212,21 @@ $border:        rgba(255, 255, 255, 0.08);
   text-align: right;
   transition: color 0.2s;
 
-  &:hover { color: lighten($accent, 15%); }
+  &:hover {
+    color: lighten($accent, 12%);
+  }
+
+  @media (max-width: 900px) {
+    text-align: center;
+  }
 }
 
 // ── STATS STRIP ───────────────────────────────────────────────────────────────
 .stats-strip {
   border-bottom: 1px solid $border;
   padding: 2rem 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
 
   .stats-strip__container {
     max-width: 1280px;
@@ -176,6 +237,11 @@ $border:        rgba(255, 255, 255, 0.08);
     justify-content: center;
     gap: 2.5rem;
     flex-wrap: wrap;
+
+    @media (max-width: 600px) {
+      gap: 1.5rem;
+      padding: 0 1.2rem;
+    }
   }
 
   .stat-item {
@@ -190,26 +256,36 @@ $border:        rgba(255, 255, 255, 0.08);
     font-weight: 800;
     color: $accent;
     line-height: 1;
+
+    @media (max-width: 480px) {
+      font-size: 1.7rem;
+    }
   }
 
   .stat-label {
     font-size: 0.75rem;
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 1px;
   }
 
   .stat-divider {
-    color: $border;
+    color: rgba(255, 255, 255, 0.15);
     font-size: 1.5rem;
 
-    @media (max-width: 500px) { display: none; }
+    @media (max-width: 500px) {
+      display: none;
+    }
   }
 }
 
 // ── FEATURES SECTION ──────────────────────────────────────────────────────────
 .features {
   padding: 6rem 2rem;
+
+  @media (max-width: 768px) {
+    padding: 4rem 1.5rem;
+  }
 
   .features__container {
     max-width: 1280px;
@@ -221,14 +297,18 @@ $border:        rgba(255, 255, 255, 0.08);
     font-family: 'Playfair Display', serif;
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
-    color: $text-primary;
+    color: #fff;
     margin: 0 0 0.75rem;
   }
 
   .features__subtitle {
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.65);
     font-size: 1.05rem;
     margin: 0 0 3.5rem;
+
+    @media (max-width: 480px) {
+      margin-bottom: 2.5rem;
+    }
   }
 
   .features__grid {
@@ -236,14 +316,18 @@ $border:        rgba(255, 255, 255, 0.08);
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 600px) {
       grid-template-columns: 1fr;
     }
   }
 }
 
 .feature-card {
-  background: $bg-card;
+  background: rgba(26, 26, 26, 0.7);
   border: 1px solid $border;
   border-radius: 16px;
   padding: 2rem;
@@ -251,22 +335,25 @@ $border:        rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(12px);
 
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(108,99,255,0.06) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.08) 0%, transparent 60%);
     opacity: 0;
     transition: opacity 0.3s;
   }
 
   &:hover {
-    border-color: rgba(108, 99, 255, 0.3);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    border-color: rgba(108, 99, 255, 0.35);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
 
-    &::before { opacity: 1; }
+    &::before {
+      opacity: 1;
+    }
   }
 
   .feature-card__number {
@@ -286,12 +373,12 @@ $border:        rgba(255, 255, 255, 0.08);
   .feature-card__title {
     font-size: 1.15rem;
     font-weight: 700;
-    color: $text-primary;
+    color: #fff;
     margin: 0 0 0.6rem;
   }
 
   .feature-card__description {
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.6);
     font-size: 0.9rem;
     line-height: 1.6;
     margin: 0;
@@ -301,9 +388,14 @@ $border:        rgba(255, 255, 255, 0.08);
 // ── HOW IT WORKS ──────────────────────────────────────────────────────────────
 .how-it-works {
   padding: 6rem 2rem;
-  background: rgba(255,255,255,0.01);
+  background: rgba(0, 0, 0, 0.3);
   border-top: 1px solid $border;
   border-bottom: 1px solid $border;
+  backdrop-filter: blur(8px);
+
+  @media (max-width: 768px) {
+    padding: 4rem 1.5rem;
+  }
 
   .how-it-works__container {
     max-width: 1280px;
@@ -315,7 +407,7 @@ $border:        rgba(255, 255, 255, 0.08);
     font-family: 'Playfair Display', serif;
     font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
-    color: $text-primary;
+    color: #fff;
     margin: 0 0 3.5rem;
   }
 
@@ -328,22 +420,23 @@ $border:        rgba(255, 255, 255, 0.08);
   }
 
   .step {
-    background: $bg-card;
+    background: rgba(26, 26, 26, 0.75);
     border: 1px solid $border;
     border-radius: 16px;
     padding: 2rem;
     width: 220px;
     flex-shrink: 0;
     transition: all 0.3s;
+    backdrop-filter: blur(10px);
 
     &:hover {
-      border-color: rgba(108,99,255,0.3);
-      transform: translateY(-4px);
+      border-color: rgba(108, 99, 255, 0.35);
+      transform: translateY(-5px);
     }
 
     .step__number {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       background: linear-gradient(135deg, $accent, #9c88ff);
       border-radius: 50%;
       display: flex;
@@ -358,13 +451,13 @@ $border:        rgba(255, 255, 255, 0.08);
     .step__title {
       font-size: 1rem;
       font-weight: 700;
-      color: $text-primary;
+      color: #fff;
       margin: 0 0 0.5rem;
     }
 
     .step__desc {
       font-size: 0.85rem;
-      color: $text-muted;
+      color: rgba(255, 255, 255, 0.6);
       line-height: 1.5;
       margin: 0;
     }
@@ -375,13 +468,19 @@ $border:        rgba(255, 255, 255, 0.08);
     color: $accent;
     font-weight: 700;
 
-    @media (max-width: 600px) { display: none; }
+    @media (max-width: 700px) {
+      display: none;
+    }
   }
 }
 
 // ── CTA SECTION ───────────────────────────────────────────────────────────────
 .cta-section {
   padding: 6rem 2rem;
+
+  @media (max-width: 768px) {
+    padding: 4rem 1.5rem;
+  }
 
   .cta-section__container {
     max-width: 600px;
@@ -393,12 +492,12 @@ $border:        rgba(255, 255, 255, 0.08);
     font-family: 'Playfair Display', serif;
     font-size: clamp(2rem, 4vw, 2.75rem);
     font-weight: 700;
-    color: $text-primary;
+    color: #fff;
     margin: 0 0 0.75rem;
   }
 
   .cta-section__subtitle {
-    color: $text-muted;
+    color: rgba(255, 255, 255, 0.65);
     font-size: 1rem;
     margin: 0 0 2.5rem;
   }
@@ -411,7 +510,7 @@ $border:        rgba(255, 255, 255, 0.08);
   }
 
   .cta-section__btn {
-    padding: 0.9rem 2rem;
+    padding: 0.95rem 2.1rem;
     border-radius: 12px;
     font-size: 1rem;
     font-weight: 600;
@@ -426,18 +525,18 @@ $border:        rgba(255, 255, 255, 0.08);
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+        box-shadow: 0 10px 30px rgba(108, 99, 255, 0.45);
       }
     }
 
     &--secondary {
-      background: transparent;
-      color: $text-primary;
-      border: 1px solid $border;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
 
       &:hover {
-        background: rgba(255,255,255,0.05);
-        border-color: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
       }
     }
   }

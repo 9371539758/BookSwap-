@@ -20,7 +20,7 @@ const MyBooks = () => {
     const fetchData = async () => {
       try {
         const data = await getMyBooks();
-        setBooks(data.books || []);
+                setBooks(data || []);
       } catch (err) {
         setError(err.response?.data?.message || err.message || "Could not load your books");
       } finally {
@@ -104,7 +104,8 @@ const MyBooks = () => {
                     {book.coverImage ? (
                       <img src={book.coverImage} alt={book.title} />
                     ) : (
-                      <div className="book-card__cover-placeholder">📖</div>
+                      <div className="book-card__cover-placeholder" ></div>
+
                     )}
                     {/* Available badge */}
                     <span className={`book-card__badge ${book.available ? "badge--available" : "badge--sold"}`}>

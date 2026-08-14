@@ -16,7 +16,8 @@ const api = axios.create({
 // Sends: title, author, price, description, coverImage, available
 export const createBook = async (bookData) => {
   const response = await api.post("/api/books", bookData);
-  return response.data; // { success, book }
+  // backend returns: { success, message, data: savedBook }
+  return response.data.data; // return saved book object
 };
 
 // GET /api/books — get all books (public browse)
@@ -25,11 +26,12 @@ export const getBooks = async () => {
   return response.data; // { success, books }
 };
 
-// GET /api/books/my-books — get only the current user's books
+// GET /api/books/my — get only the current user's books
 // Protected route — requires valid JWT cookie
 export const getMyBooks = async () => {
-  const response = await api.get("/api/books/my-books");
-  return response.data; // { success, books }
+  const response = await api.get("/api/books/my");
+  // backend responds { success, count, data: [books] }
+  return response.data.data; // returns the array of books
 };
 
 // DELETE /api/books/:id — delete a book by ID

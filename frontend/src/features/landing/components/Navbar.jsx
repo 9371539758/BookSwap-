@@ -120,6 +120,16 @@ const Navbar = () => {
               >
                 Sign Up
               </button>
+
+              <button
+  className="navbar__theme-toggle"
+  onClick={toggleTheme}
+  aria-label="Toggle theme"
+>
+  <span className="navbar__theme-icon">
+    {isDark ? "☀️" : "🌙"}
+  </span>
+</button>
             </>
           )}
         </div>

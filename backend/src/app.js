@@ -12,6 +12,7 @@ import "./config/passport.js";
 import googleAuthRoutes from "./routes/googleAuth.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import bookRoutes from "./routes/book.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 const app = express();
 
 /* ============================================================
@@ -144,6 +145,9 @@ app.use("/api/auth", authRoutes);
 // PUT    /api/books/:id    - Update a book (owner only)
 // DELETE /api/books/:id    - Delete a book (owner only)
 app.use("/api/books", bookRoutes);
+
+// Uploads route (Cloudinary streaming)
+app.use("/api/uploads", uploadRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
