@@ -155,3 +155,51 @@ export const deleteBook = async (req, res) => {
     });
   }
 };
+// Get ALL books (public browse – no login required)
+export const getAllBooks = async (req, res) => {
+  try {
+    const { category, condition, search, page = 1, limit = 20 } = req.query;
+
+    const filter = {};
+
+    // Optional filters
+    if (category) filter.category = category;
+    if (condition) filter.condition = condition;
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { author: { $regex: search, $options: "i" } },
+        { isbn: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Only show available books by default (optional)
+    // filter.available = true;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [books, total] = await Promise.all([
+      Book.find(filter)
+        .populate("userId", "name email") // optional: show owner info
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit)),
+      Book.countDocuments(filter),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      count: books.length,
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
+      data: books,
+    });
+  } catch (error) {
+    console.error("Get all books error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching books",
+    });
+  }
+};
