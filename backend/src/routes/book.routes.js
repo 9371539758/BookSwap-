@@ -2,6 +2,8 @@
 import express from "express";
 import {
   addBook,
+  getAllBooks,
+  getBookById,
   getMyBooks,
   deleteBook,
 } from "../controllers/book.controller.js";
@@ -11,9 +13,11 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, addBookValidator, validate, addBook);
+router.get("/", getAllBooks);
 router.get("/my", authMiddleware, getMyBooks);
 router.get("/my-books", authMiddleware, getMyBooks); // backward compatibility for older frontend builds
+router.get("/:id", getBookById);
+router.post("/", authMiddleware, addBookValidator, validate, addBook);
 router.delete("/:id", authMiddleware, deleteBook);
 
 export default router;

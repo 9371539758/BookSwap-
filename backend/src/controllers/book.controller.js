@@ -1,6 +1,57 @@
 // controllers/book.controller.js
 import Book from "../model/book.model.js";
 
+export const getAllBooks = async (req, res) => {
+  try {
+    const books = await Book.find().sort({ createdAt: -1 }).populate("userId", "username fullName email");
+
+    return res.status(200).json({
+      success: true,
+      count: books.length,
+      data: books,
+    });
+  } catch (error) {
+    console.error("Get all books error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching books",
+    });
+  }
+};
+
+export const getBookById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const book = await Book.findById(id).populate("userId", "username fullName email");
+
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        message: "Book not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: book,
+    });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid book ID",
+      });
+    }
+
+    console.error("Get book by ID error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching the book",
+    });
+  }
+};
+
 export const addBook = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
