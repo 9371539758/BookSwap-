@@ -2,13 +2,13 @@
 // Fixed at top, hides on scroll-down, shows on scroll-up.
 // Uses glassmorphism effect on scroll.
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-$accent:       #6c63ff;
-$bg-dark:      #0f0f0f;
+$accent: #6c63ff;
+$bg-dark: #0f0f0f;
 $text-primary: #f0f0f0;
-$text-muted:   #888;
-$border:       rgba(255, 255, 255, 0.08);
+$text-muted: #888;
+$border: rgba(255, 255, 255, 0.08);
 
 // ── Base Navbar ────────────────────────────────────────────────────────────────
 .navbar {
@@ -21,8 +21,9 @@ $border:       rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid $border;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.3s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease;
 
   // Hide when scrolling down
   &--hidden {
@@ -71,7 +72,7 @@ $border:       rgba(255, 255, 255, 0.08);
     color: $text-primary;
     letter-spacing: -0.3px;
     transition: color 0.2s;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
   }
 }
 
@@ -91,14 +92,22 @@ $border:       rgba(255, 255, 255, 0.08);
 
 .navbar__item {
   .navbar__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.4rem 0.85rem;
     color: $text-muted;
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 500;
     border-radius: 8px;
-    transition: color 0.2s, background 0.2s;
-    font-family: 'Inter', sans-serif;
+    transition:
+      color 0.2s,
+      background 0.2s;
+    font-family: "Inter", sans-serif;
+    background: transparent;
+    border: none;
+    cursor: pointer;
 
     &:hover {
       color: $text-primary;
@@ -153,7 +162,7 @@ $border:       rgba(255, 255, 255, 0.08);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 // ── Buttons ────────────────────────────────────────────────────────────────────
@@ -165,7 +174,7 @@ $border:       rgba(255, 255, 255, 0.08);
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   white-space: nowrap;
 
   // Login button — ghost style
@@ -176,8 +185,8 @@ $border:       rgba(255, 255, 255, 0.08);
 
     &:hover {
       color: $text-primary;
-      border-color: rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.05);
     }
   }
 
@@ -194,13 +203,13 @@ $border:       rgba(255, 255, 255, 0.08);
 
   // Secondary actions (List Book, My Books)
   &--secondary {
-    background: rgba(255,255,255,0.06);
+    background: rgba(255, 255, 255, 0.06);
     color: $text-primary;
     border: 1px solid $border;
 
     &:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
     }
   }
 

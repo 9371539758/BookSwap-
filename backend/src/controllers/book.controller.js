@@ -1,23 +1,23 @@
 // controllers/book.controller.js
 import Book from "../model/book.model.js";
 
-export const getAllBooks = async (req, res) => {
-  try {
-    const books = await Book.find().sort({ createdAt: -1 }).populate("userId", "username fullName email");
+// export const getAllBooks = async (req, res) => {
+//   try {
+//     const books = await Book.find().sort({ createdAt: -1 }).populate("userId", "username fullName email");
 
-    return res.status(200).json({
-      success: true,
-      count: books.length,
-      data: books,
-    });
-  } catch (error) {
-    console.error("Get all books error:", error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong while fetching books",
-    });
-  }
-};
+//     return res.status(200).json({
+//       success: true,
+//       count: books.length,
+//       data: books,
+//     });
+//   } catch (error) {
+//     console.error("Get all books error:", error.message);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Something went wrong while fetching books",
+//     });
+//   }
+// };
 
 export const getBookById = async (req, res) => {
   try {

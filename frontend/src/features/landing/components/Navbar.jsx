@@ -60,12 +60,11 @@ const Navbar = () => {
           <li className="navbar__item">
             <a href="#how-it-works" className="navbar__link">How It Works</a>
           </li>
-          <li>
-          {/* Real route instead of #browse */}
+          <li className="navbar__item">
             <button
-              className="navbar__link"
+              className="navbar__link navbar__link--button"
               onClick={() => navigate("/browse")}
-             
+              type="button"
             >
               Browse
             </button>
