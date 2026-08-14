@@ -17,16 +17,37 @@ export const useAuth = () => {
 
   // ─── REGISTER ───────────────────────────────────────────────────────────────
   // Creates a new account. On success → stores user in state + sessionStorage.
-  async function handleRegister({ username, fullName, email, password, phone, location }) {
+  async function handleRegister({
+    username,
+    fullName,
+    email,
+    password,
+    phone,
+    location,
+  }) {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
-      const data = await register({ username, fullName, email, password, phone, location });
-      // Dispatch SET_USER → reducer writes to sessionStorage + updates state
+      const data = await register({
+        username,
+        fullName,
+        email,
+        password,
+        phone,
+        location,
+      });
+      if (data?.token) {
+        try {
+          localStorage.setItem("bookswap_token", data.token);
+          sessionStorage.setItem("bookswap_token", data.token);
+        } catch {
+          // ignore storage issues
+        }
+      }
       dispatch({ type: "SET_USER", payload: data.user });
       return data;
     } catch (error) {
       dispatch({ type: "SET_LOADING", payload: false });
-      throw error; // let the component show the error message
+      throw error;
     }
   }
 
@@ -37,12 +58,19 @@ export const useAuth = () => {
     dispatch({ type: "SET_LOADING", payload: true });
     try {
       const data = await login({ identifier, password });
-      // Dispatch SET_USER → reducer writes to sessionStorage + updates state
+      if (data?.token) {
+        try {
+          localStorage.setItem("bookswap_token", data.token);
+          sessionStorage.setItem("bookswap_token", data.token);
+        } catch {
+          // ignore storage issues
+        }
+      }
       dispatch({ type: "SET_USER", payload: data.user });
       return data;
     } catch (error) {
       dispatch({ type: "SET_LOADING", payload: false });
-      throw error; // let the component show the error message
+      throw error;
     }
   }
 

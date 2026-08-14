@@ -9,8 +9,12 @@ import { env } from "../config/env.js";
 
 export const authMiddleware = (req, res, next) => {
   try {
-    // Read token from the httpOnly cookie set during login/register
-    const token = req.cookies?.token;
+    const cookieToken = req.cookies?.token;
+    const authHeader = req.headers.authorization || "";
+    const headerToken = authHeader.startsWith("Bearer ")
+      ? authHeader.replace("Bearer ", "")
+      : "";
+    const token = cookieToken || headerToken;
 
     if (!token) {
       return res.status(401).json({
@@ -19,13 +23,10 @@ export const authMiddleware = (req, res, next) => {
       });
     }
 
-    // Verify and decode the JWT using our secret key
     const decoded = jwt.verify(token, env.JWT_SECRET);
-
-    // Attach decoded payload {id} to request — available in all route handlers
     req.user = decoded;
 
-    next(); // pass to the actual route controller
+    next();
   } catch (error) {
     return res.status(401).json({
       success: false,

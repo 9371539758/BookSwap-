@@ -26,17 +26,16 @@ const writeSession = (user) => {
   if (user) {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
   } else {
-    sessionStorage.removeItem(SESSION_KEY); // clear on logout
+    sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem("bookswap_token");
+    sessionStorage.removeItem("bookswap_token");
   }
 };
 
-// ─── INITIAL STATE ────────────────────────────────────────────────────────────
-// Hydrate from sessionStorage so page refresh doesn't flicker to logged-out state
-
 const initialState = {
-  user: readSession(),      // current logged-in user object (or null)
-  loading: false,           // true when any auth API call is in progress
-  initialized: false,       // true after first /getme check completes
+  user: readSession(),
+  loading: false,
+  initialized: false,
 };
 
 // ─── REDUCER ──────────────────────────────────────────────────────────────────
@@ -45,22 +44,17 @@ const initialState = {
 
 function authReducer(state, action) {
   switch (action.type) {
-
-    // Called when login/register succeeds — store user in state + sessionStorage
     case "SET_USER":
       writeSession(action.payload);
       return { ...state, user: action.payload, loading: false, initialized: true };
 
-    // Called on logout or session expiry — wipe user from state + sessionStorage
     case "CLEAR_USER":
       writeSession(null);
       return { ...state, user: null, loading: false, initialized: true };
 
-    // Called before any async auth operation starts
     case "SET_LOADING":
       return { ...state, loading: action.payload };
 
-    // Called after /getme completes (success or fail) — marks app as ready
     case "SET_INITIALIZED":
       return { ...state, initialized: true, loading: false };
 
@@ -85,16 +79,14 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: "SET_LOADING", payload: true });
       try {
         const data = await getme();
-        // Cookie is valid — update user with fresh data from DB
         dispatch({ type: "SET_USER", payload: data.user });
       } catch {
-        // Cookie expired or user deleted — clear the stale session
         dispatch({ type: "CLEAR_USER" });
       }
     };
 
     verifySession();
-  }, []); // runs only once on mount
+  }, []);
 
   // ─── CONTEXT VALUE ──────────────────────────────────────────────────────────
   // Expose state + dispatch to all children
@@ -102,8 +94,8 @@ export const AuthProvider = ({ children }) => {
     user: state.user,
     loading: state.loading,
     initialized: state.initialized,
-    isAuthenticated: !!state.user, // boolean shorthand for easy checks
-    dispatch,                      // children use dispatch to trigger state changes
+    isAuthenticated: !!state.user,
+    dispatch,
   };
 
   return (
