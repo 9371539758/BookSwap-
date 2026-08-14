@@ -6,7 +6,7 @@ import axios from "axios";
 // baseURL is empty — Vite proxy forwards /api/* requests to backend:3000
 
 const api = axios.create({
-  baseURL: "", // empty: Vite proxy handles /api → backend:3000
+  baseURL: import.meta.env.VITE_API_URL, // empty: Vite proxy handles /api → backend:3000
   withCredentials: true, // REQUIRED: sends JWT cookie for protected book routes
 });
 

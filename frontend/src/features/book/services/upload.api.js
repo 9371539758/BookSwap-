@@ -2,7 +2,7 @@
 // Uploads a file to the backend /api/uploads endpoint using multipart/form-data
 import axios from "axios";
 
-const api = axios.create({ baseURL: "", withCredentials: true });
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL, withCredentials: true });
 
 export const uploadCover = async (file) => {
   const fd = new FormData();
