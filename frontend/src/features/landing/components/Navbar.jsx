@@ -1,6 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useState, useEffect } from "react";
+import { useChatSocket } from "../../chat/chat.context";
+import { fetchConnections } from "../../chat/services/chat.api";
 import "../styles/navbar.scss";
 
 // ─── NAVBAR COMPONENT ─────────────────────────────────────────────────────────
@@ -9,11 +11,43 @@ import "../styles/navbar.scss";
 // Scroll behavior: hides when scrolling down, reappears on scroll up.
 
 const Navbar = () => {
+  const { socket } = useChatSocket();
+  const [incomingCount, setIncomingCount] = useState(0);
+  const loadIncomingCount = async () => {
+    try {
+      const connections = await fetchConnections();
+      setIncomingCount(connections.incoming.length);
+    } catch {
+      setIncomingCount(0);
+    }
+  };
   const navigate = useNavigate();
   const { user, handleLogout } = useAuth(); // FIX: was `logout` — correct name is `handleLogout`
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [scrolled, setScrolled] = useState(false); // adds shadow after scrolling
+
+  useEffect(() => {
+    if (user) loadIncomingCount();
+  }, [user?._id]);
+
+  useEffect(() => {
+    if (!user) return undefined;
+    const interval = window.setInterval(loadIncomingCount, 5000);
+    return () => window.clearInterval(interval);
+  }, [user?._id]);
+
+  useEffect(() => {
+    if (!socket) return undefined;
+    socket.on("connection:incoming", loadIncomingCount);
+    socket.on("connection:accepted", loadIncomingCount);
+    socket.on("connection:rejected", loadIncomingCount);
+    return () => {
+      socket.off("connection:incoming", loadIncomingCount);
+      socket.off("connection:accepted", loadIncomingCount);
+      socket.off("connection:rejected", loadIncomingCount);
+    };
+  }, [socket]);
 
   // ─── SCROLL BEHAVIOR ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -102,6 +136,33 @@ const Navbar = () => {
                 onClick={() => navigate("/my-books")}
               >
                 My Books
+              </button>
+
+              <button
+                className="navbar__btn navbar__btn--secondary"
+                onClick={() => navigate("/nearby")}
+              >
+                Nearby Books
+              </button>
+
+              <button
+                className="navbar__btn navbar__btn--secondary"
+                onClick={() => navigate("/chats")}
+              >
+                Chats
+              </button>
+
+              <button
+                className="navbar__notification"
+                onClick={() => navigate("/chats")}
+                type="button"
+                aria-label={`Connection requests: ${incomingCount}`}
+                title="Connection requests"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+                </svg>
+                {incomingCount > 0 && <span>{incomingCount > 99 ? "99+" : incomingCount}</span>}
               </button>
 
               <button

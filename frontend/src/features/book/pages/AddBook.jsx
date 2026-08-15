@@ -27,7 +27,7 @@ const AddBook = () => {
     price: "",
     description: "",
     coverImage: "",
-    location: { city: "", state: "" },
+    location: { city: "", state: "", coordinates: {} },
     available: true,
   });
 
@@ -56,6 +56,27 @@ const AddBook = () => {
 
     // Also clear any previous coverImage string stored in form
     setForm((prev) => ({ ...prev, coverImage: "" }));
+  };
+
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Location is not supported by this browser");
+      return;
+    }
+    setError("");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setForm((prev) => ({
+          ...prev,
+          location: {
+            ...prev.location,
+            coordinates: { latitude: coords.latitude, longitude: coords.longitude },
+          },
+        }));
+      },
+      () => setError("We could not get your location. Please allow location access and try again."),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const submitHandler = async (e) => {
@@ -88,10 +109,13 @@ const AddBook = () => {
       };
 
       // Attach location only when provided
-      if (form.location?.city || form.location?.state) {
+      if (form.location?.city || form.location?.state || form.location?.coordinates?.latitude != null) {
         payload.location = {
           city: form.location.city?.trim() || undefined,
           state: form.location.state?.trim() || undefined,
+          coordinates: form.location.coordinates?.latitude != null
+            ? form.location.coordinates
+            : undefined,
         };
       }
 
@@ -157,6 +181,13 @@ const AddBook = () => {
                 <label htmlFor="author">Author *</label>
                 <input id="author" name="author" type="text" placeholder="e.g. James Clear" value={form.author} onChange={handleChange} />
               </div>
+            </div>
+
+            <div className="field">
+              <button className="location-btn" type="button" onClick={useCurrentLocation}>
+                {form.location.coordinates?.latitude != null ? "✓ Listing location added" : "Use my current location for nearby matching"}
+              </button>
+              <small className="location-help">Your precise coordinates are used only to calculate nearby book distances.</small>
             </div>
 
             <div className="form-row">

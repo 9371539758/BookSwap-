@@ -57,6 +57,16 @@ export const addBookValidator = [
     .trim()
     .isLength({ max: 100 }),
 
+  body("location.coordinates.latitude")
+    .optional({ checkFalsy: true })
+    .isFloat({ min: -90, max: 90 })
+    .withMessage("Invalid location latitude"),
+
+  body("location.coordinates.longitude")
+    .optional({ checkFalsy: true })
+    .isFloat({ min: -180, max: 180 })
+    .withMessage("Invalid location longitude"),
+
   body("coverImage")
     .optional({ checkFalsy: true })
     .isURL().withMessage("Cover image must be a valid URL"),

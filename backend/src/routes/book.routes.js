@@ -3,6 +3,7 @@ import express from "express";
 import {
   addBook,
   getAllBooks,
+  getNearbyBooks,
   getBookById,
   getMyBooks,
   deleteBook,
@@ -15,6 +16,7 @@ const router = express.Router();
 router.get("/", getAllBooks);           // or /all, /browse, whatever you prefer
 
 router.get("/", getAllBooks);
+router.get("/nearby", authMiddleware, getNearbyBooks);
 router.get("/my", authMiddleware, getMyBooks);
 router.get("/my-books", authMiddleware, getMyBooks); // backward compatibility for older frontend builds
 router.get("/:id", getBookById);

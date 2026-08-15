@@ -90,6 +90,18 @@
   gap: 0;
 }
 
+.location-btn {
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(74, 222, 128, 0.45);
+  border-radius: 8px;
+  background: rgba(74, 222, 128, 0.1);
+  color: #8df0ad;
+  cursor: pointer;
+}
+
+.location-help { display: block; margin-top: 0.45rem; color: #888; }
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

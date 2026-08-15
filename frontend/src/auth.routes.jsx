@@ -9,6 +9,8 @@ import AuthSuccess from "./features/auth/pages/AuthSuccess";
 import Landing from "./features/landing/pages/Landing";
 import AddBook from "./features/book/pages/AddBook";
 import MyBooks from "./features/book/pages/MyBooks";
+import NearbyBooks from "./features/book/pages/NearbyBooks";
+import Chats from "./features/chat/pages/Chats";
 import Browse from "./features/book/pages/Browse";   // ← add this import
 
 // ─── AUTH LAYOUT (No Navbar) ──────────────────────────────────────────────────
@@ -88,6 +90,8 @@ const router = createBrowserRouter([
       { path: "/home", element: <Landing /> },
       { path: "/add-book", element: <AddBook /> },
       { path: "/my-books", element: <MyBooks /> },
+      { path: "/nearby", element: <NearbyBooks /> },
+      { path: "/chats", element: <Chats /> },
       { path: "/browse", element: <Browse /> },
     ],
   },

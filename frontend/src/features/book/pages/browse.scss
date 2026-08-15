@@ -94,7 +94,6 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
   }
 
-  // Apple-like enter animation
   &--animate {
     animation: cardFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
@@ -150,6 +149,56 @@
     margin: 10px 0 0;
     font-weight: 700;
     font-size: 15px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  &__request-status {
+    margin: 9px 0 0;
+    color: #a7dcb8;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  &__btn {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    &--buy {
+      background: #4ade80;
+      color: #0a0a0a;
+
+      &:hover {
+        background: #22c55e;
+        box-shadow: 0 4px 14px rgba(74, 222, 128, 0.25);
+      }
+    }
+
+    &--contact {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #444;
+
+      &:hover {
+        border-color: #666;
+        background: #222;
+      }
+    }
   }
 }
 

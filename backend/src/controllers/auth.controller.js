@@ -144,6 +144,7 @@ export const logout = (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
       expires: new Date(0), // Expire the cookie immediately
     })
     .json({

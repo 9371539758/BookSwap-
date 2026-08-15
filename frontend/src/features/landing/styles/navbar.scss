@@ -165,6 +165,25 @@ $border: rgba(255, 255, 255, 0.08);
   font-family: "Inter", sans-serif;
 }
 
+.navbar__notification {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid $border;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: $text-primary;
+  cursor: pointer;
+
+  &:hover { background: rgba(255, 255, 255, 0.12); }
+
+  svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  span { position: absolute; top: -6px; right: -8px; min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center; border: 2px solid $bg-dark; border-radius: 10px; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; }
+}
+
 // ── Buttons ────────────────────────────────────────────────────────────────────
 .navbar__btn {
   padding: 0.45rem 1rem;

@@ -1,7 +1,7 @@
 // test-cloudinary.js
 // Quick test: upload a public image URL to Cloudinary using server-side SDK
 // Uses backend/utils/cloudinary.js (reads .env).
-import cloudinary from './utils/cloudinary.js';
+import cloudinary from '../utils/cloudinary.js';
 
 (async () => {
   try {

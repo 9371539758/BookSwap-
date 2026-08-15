@@ -13,6 +13,7 @@ import googleAuthRoutes from "./routes/googleAuth.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import bookRoutes from "./routes/book.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import connectionRoutes from "./routes/connection.routes.js";
 const app = express();
 
 /* ============================================================
@@ -39,8 +40,6 @@ app.use(
       const allowedOrigins = [
         "http://localhost:5173",
         "http://localhost:5174",
-        "https://book-swap-blond.vercel.app",
-        "https://book-swap-puce.vercel.app",
         "https://bookswap-frontend-4ayc.onrender.com",
         "https://bookswap-backend-vvkg.onrender.com",
         process.env.CLIENT_URL,
@@ -148,6 +147,7 @@ app.use("/api/books", bookRoutes);
 
 // Uploads route (Cloudinary streaming)
 app.use("/api/uploads", uploadRoutes);
+app.use("/api/connections", connectionRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({

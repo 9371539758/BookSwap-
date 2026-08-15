@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../../auth/hooks/useAuth";
+import { useChatSocket } from "../../chat/chat.context";
 import "./browse.scss";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -18,6 +20,22 @@ const fetchBooks = async () => {
 
 const Browse = () => {
   const [search, setSearch] = useState("");
+  const [requestState, setRequestState] = useState({});
+  const { user } = useAuth();
+  const { socket, isConnected } = useChatSocket();
+
+  const connectWithOwner = (book) => {
+    const ownerId = book.userId?._id || book.userId;
+    if (!ownerId || ownerId === user?._id) return;
+    if (!socket || !isConnected) {
+      setRequestState((current) => ({ ...current, [book._id]: "Chat is connecting. Please try Connect again in a moment." }));
+      return;
+    }
+    setRequestState((current) => ({ ...current, [book._id]: "Sending request..." }));
+    socket.emit("connection:request", { toUserId: ownerId, bookId: book._id }, (result) => {
+      setRequestState((current) => ({ ...current, [book._id]: result?.ok ? "Request sent — waiting for acceptance" : result?.message || "Could not send request" }));
+    });
+  };
 
   const {
     data: books = [],
@@ -93,7 +111,7 @@ const Browse = () => {
                 exit={{ opacity: 0, scale: 0.9, y: 10 }}
                 transition={{
                   duration: 0.35,
-                  ease: [0.22, 1, 0.36, 1], // Apple-like easing
+                  ease: [0.22, 1, 0.36, 1],
                 }}
               >
                 {book.coverImage ? (
@@ -115,6 +133,18 @@ const Browse = () => {
                   {book.price > 0 && (
                     <p className="book-card__price">₹{book.price}</p>
                   )}
+
+                  <div className="book-card__actions">
+                    <button type="button" className="book-card__btn book-card__btn--buy">
+                      Buy
+                    </button>
+                    {String(book.userId?._id || book.userId) !== String(user?._id) && (
+                      <button type="button" className="book-card__btn book-card__btn--contact" onClick={() => connectWithOwner(book)}>
+                        {requestState[book._id]?.startsWith("Request sent") ? "Requested" : "Connect"}
+                      </button>
+                    )}
+                  </div>
+                  {requestState[book._id] && <p className="book-card__request-status">{requestState[book._id]}</p>}
                 </div>
               </motion.div>
             ))}

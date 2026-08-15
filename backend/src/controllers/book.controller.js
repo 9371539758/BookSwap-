@@ -1,6 +1,45 @@
 // controllers/book.controller.js
 import Book from "../model/book.model.js";
 
+const distanceInKm = (fromLat, fromLng, toLat, toLng) => {
+  const earthRadiusKm = 6371;
+  const toRadians = (value) => (value * Math.PI) / 180;
+  const latDistance = toRadians(toLat - fromLat);
+  const lngDistance = toRadians(toLng - fromLng);
+  const value =
+    Math.sin(latDistance / 2) ** 2 +
+    Math.cos(toRadians(fromLat)) * Math.cos(toRadians(toLat)) * Math.sin(lngDistance / 2) ** 2;
+  return earthRadiusKm * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+};
+
+export const getNearbyBooks = async (req, res) => {
+  const latitude = Number(req.query.latitude);
+  const longitude = Number(req.query.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+    return res.status(400).json({ success: false, message: "A valid current location is required" });
+  }
+
+  try {
+    const books = await Book.find({ available: true })
+      .populate("userId", "username fullName location")
+      .sort({ createdAt: -1 });
+
+    const nearbyBooks = books
+      .filter((book) => Number.isFinite(book.location?.coordinates?.latitude) && Number.isFinite(book.location?.coordinates?.longitude))
+      .map((book) => ({
+        ...book.toObject(),
+        distanceKm: Number(distanceInKm(latitude, longitude, book.location.coordinates.latitude, book.location.coordinates.longitude).toFixed(1)),
+      }))
+      .sort((first, second) => first.distanceKm - second.distanceKm);
+
+    res.json({ success: true, count: nearbyBooks.length, data: nearbyBooks });
+  } catch (error) {
+    console.error("Nearby books error:", error.message);
+    res.status(500).json({ success: false, message: "Could not find nearby books" });
+  }
+};
+
 // export const getAllBooks = async (req, res) => {
 //   try {
 //     const books = await Book.find().sort({ createdAt: -1 }).populate("userId", "username fullName email");
@@ -231,7 +270,7 @@ export const getAllBooks = async (req, res) => {
 
     const [books, total] = await Promise.all([
       Book.find(filter)
-        .populate("userId", "name email") // optional: show owner info
+        .populate("userId", "username fullName location")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit)),

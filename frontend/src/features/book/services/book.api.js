@@ -38,6 +38,11 @@ export const getBooks = async () => {
   return response.data;
 };
 
+export const getNearbyBooks = async (latitude, longitude) => {
+  const response = await api.get("/api/books/nearby", { params: { latitude, longitude } });
+  return response.data.data;
+};
+
 export const getMyBooks = async () => {
   try {
     const response = await api.get("/api/books/my");
