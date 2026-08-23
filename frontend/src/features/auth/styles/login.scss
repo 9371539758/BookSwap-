@@ -266,7 +266,7 @@ $error-color:   #ff6b6b;
     font-family: 'Inter', sans-serif;
     transition: border-color 0.2s;
     box-sizing: border-box;
-    -webkit-appearance: none; // remove iOS default styles
+    // -webkit-appearance: none; // remove iOS default styles
 
     &::placeholder {
       color: rgba(255, 255, 255, 0.32);
