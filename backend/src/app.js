@@ -3,18 +3,26 @@ import passport from "passport";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import compression from "compression";
 import "dotenv/config.js";
 
 // Load Passport Google OAuth configuration
 import "./config/passport.js";
 
-// Import authentication routes
+// Import routes
 import googleAuthRoutes from "./routes/googleAuth.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import bookRoutes from "./routes/book.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import connectionRoutes from "./routes/connection.routes.js";
+
 const app = express();
+
+// ─── GZIP COMPRESSION ─────────────────────────────────────────────────────────
+// Compresses all JSON/text responses before sending.
+// Reduces response size by ~70% — faster page loads, less bandwidth.
+// Skips small responses (< 1kb) where compression overhead isn't worth it.
+app.use(compression({ threshold: 1024 }));
 
 /* ============================================================
    CORE MIDDLEWARE

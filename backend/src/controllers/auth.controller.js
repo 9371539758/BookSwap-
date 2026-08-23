@@ -31,7 +31,7 @@ export const register = async (req, res) => {
     // Create user — username and fullName stored separately
     const user = await userModel.create({
       username,
-      fullName: fullName || username, // fallback to username if no fullName given
+      fullName: fullName || username, 
       email,
       password,
       phone: phone || undefined,

@@ -13,14 +13,18 @@ import { validate } from "../middleware/validate.middleware.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
-router.get("/", getAllBooks);           // or /all, /browse, whatever you prefer
 
-router.get("/", getAllBooks);
-router.get("/nearby", authMiddleware, getNearbyBooks);
-router.get("/my", authMiddleware, getMyBooks);
-router.get("/my-books", authMiddleware, getMyBooks); // backward compatibility for older frontend builds
-router.get("/:id", getBookById);
-router.post("/", authMiddleware, addBookValidator, validate, addBook);
-router.delete("/:id", authMiddleware, deleteBook);
+// NOTE: specific paths (/nearby, /my) must be defined BEFORE /:id
+// otherwise Express matches them as an id param
+
+router.get("/nearby",   authMiddleware, getNearbyBooks);  // GET /api/books/nearby?latitude=&longitude=
+router.get("/my",       authMiddleware, getMyBooks);      // GET /api/books/my
+router.get("/my-books", authMiddleware, getMyBooks);      // backward-compat alias
+router.get("/",         getAllBooks);                     // GET /api/books (public browse)
+router.get("/:id",      getBookById);                    // GET /api/books/:id
+
+router.post("/",        authMiddleware, addBookValidator, validate, addBook);  // create
+router.delete("/:id",   authMiddleware, deleteBook);     // owner-only delete
 
 export default router;
+

@@ -37,7 +37,10 @@ router.get(
         failureRedirect: `${
           process.env.CLIENT_URL ||
           process.env.FRONTEND_URL ||
-          "https://book-swap-blond.vercel.app"
+          // "https://book-swap-blond.vercel.app"
+          "http://localhost:5173",
+          "https://bookswap-frontend-4ayc.onrender.com"
+
         }/login?error=auth_failed`,
         session: false,
       })
