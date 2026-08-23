@@ -1,0 +1,7 @@
+/* Netlify: rewrite all non-file requests to index.html (React Router handles routing) */
+/*          Without this, refreshing /nearby or /chats gives a 404 from the server     */
+/* 200 = serve index.html WITHOUT changing the URL (silent rewrite, not a redirect)    */
+/* The /api/* exclusion ensures real API calls go through normally                     */
+
+/api/*  /api/:splat  200
+/*      /index.html  200

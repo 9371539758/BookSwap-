@@ -1,98 +1,134 @@
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+
 import { useAuth } from "./features/auth/hooks/useAuth";
 import Navbar from "./features/landing/components/Navbar";
 
-// ─── Page Imports ─────────────────────────────────────────────────────────────
-import Login from "./features/auth/pages/Login";
-import Register from "./features/auth/pages/Register";
-import AuthSuccess from "./features/auth/pages/AuthSuccess";
-import Landing from "./features/landing/pages/Landing";
-import AddBook from "./features/book/pages/AddBook";
-import MyBooks from "./features/book/pages/MyBooks";
-import NearbyBooks from "./features/book/pages/NearbyBooks";
-import Chats from "./features/chat/pages/Chats";
-import Browse from "./features/book/pages/Browse";   // ← add this import
+// ─── LAZY PAGE IMPORTS ────────────────────────────────────────────────────────
+// React.lazy() splits each page into its own JS chunk.
+// The browser only downloads a page's code when the user navigates to it.
+// This makes the initial app load significantly faster.
+
+const Login       = lazy(() => import("./features/auth/pages/Login"));
+const Register    = lazy(() => import("./features/auth/pages/Register"));
+const AuthSuccess = lazy(() => import("./features/auth/pages/AuthSuccess"));
+const Landing     = lazy(() => import("./features/landing/pages/Landing"));
+const AddBook     = lazy(() => import("./features/book/pages/AddBook"));
+const MyBooks     = lazy(() => import("./features/book/pages/MyBooks"));
+const NearbyBooks = lazy(() => import("./features/book/pages/NearbyBooks"));
+const Chats       = lazy(() => import("./features/chat/pages/Chats"));
+const Browse      = lazy(() => import("./features/book/pages/Browse"));
+
+// ─── PAGE LOADING FALLBACK ────────────────────────────────────────────────────
+// Shown while a lazy page chunk is being downloaded.
+// Keeps the dark background so there's no white flash.
+const PageLoader = () => (
+  <div style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100vh",
+    background: "#0f0f0f",
+    color: "#6c63ff",
+    fontSize: "1rem",
+    fontFamily: "Inter, sans-serif",
+    gap: "0.75rem",
+  }}>
+    <span style={{
+      width: 20, height: 20,
+      border: "2px solid rgba(108,99,255,0.3)",
+      borderTopColor: "#6c63ff",
+      borderRadius: "50%",
+      display: "inline-block",
+      animation: "spin 0.7s linear infinite",
+    }} />
+    Loading...
+    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+  </div>
+);
 
 // ─── AUTH LAYOUT (No Navbar) ──────────────────────────────────────────────────
-// Used for /login and /register pages.
-// If user is already logged in → redirect to home automatically.
+// Used for /login and /register.
+// If already logged in → redirects to / automatically.
 const AuthLayout = () => {
   const { isAuthenticated, initialized } = useAuth();
 
-  // Wait until session verification completes before deciding to redirect
-  if (!initialized) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#0f0f0f", color: "#fff" }}>
-        Loading...
-      </div>
-    );
-  }
-
-  // Already logged in → no need to see login/register → go to landing
+  if (!initialized) return <PageLoader />;
   if (isAuthenticated) return <Navigate to="/" replace />;
 
-  // Not logged in → show the auth page (no navbar rendered)
-  return <Outlet />;
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Outlet />
+    </Suspense>
+  );
 };
 
 // ─── PROTECTED LAYOUT (With Navbar) ──────────────────────────────────────────
-// Used for all pages that require login: /, /home, /add-book, /my-books
-// If user is NOT logged in → redirect to /login
+// Used for all pages requiring login.
+// If NOT logged in → redirects to /login.
 const ProtectedLayout = () => {
   const { isAuthenticated, initialized } = useAuth();
 
-  // Wait for session check to complete
-  if (!initialized) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#0f0f0f", color: "#fff" }}>
-        Loading...
-      </div>
-    );
-  }
-
-  // Not logged in → redirect to login page
+  if (!initialized) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
-  // Logged in → show Navbar + page content
   return (
     <>
       <Navbar />
-      <Outlet />
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
     </>
   );
 };
 
 // ─── ROUTER ───────────────────────────────────────────────────────────────────
 // Route flow:
-//  /login  → AuthLayout (no navbar) → Login page
-//  /register → AuthLayout (no navbar) → Register page
-//  / or /home → ProtectedLayout (with navbar) → Landing page
-//  /add-book → ProtectedLayout (with navbar) → AddBook page
-//  /my-books → ProtectedLayout (with navbar) → MyBooks page
+//   /login      → no navbar, redirect if logged in
+//   /register   → no navbar, redirect if logged in
+//   /auth/success → Google OAuth callback handler
+//   /           → protected, Landing page
+//   /browse     → protected, Browse all books
+//   /nearby     → protected, Books near you
+//   /add-book   → protected, List a book
+//   /my-books   → protected, Your listings
+//   /chats      → protected, Chat with book owners
+//
+// NOTE: vercel.json and public/_redirects ensure that refreshing any of these
+//       URLs does NOT return a 404 from the deployment server.
 
 const router = createBrowserRouter([
-  { path: "/auth/success", element: <AuthSuccess /> },
+  // Google OAuth success handler — no layout needed
+  // { path: "/auth/success", element: <Suspense fallback={<PageLoader />}><AuthSuccess /></Suspense> },
+{
+  path: "/auth/success",
+  element: (
+    <Suspense fallback={<PageLoader />}>
+      <AuthSuccess />
+    </Suspense>
+  ),
+},
 
-  // ── Auth routes — no navbar, redirect if already logged in ──
+  // ── Auth routes — no navbar ──
   {
     element: <AuthLayout />,
     children: [
-      { path: "/login", element: <Login /> },
+      { path: "/login",    element: <Login /> },
       { path: "/register", element: <Register /> },
     ],
   },
 
-  // ── Protected routes — with navbar, redirect if not logged in ──
+  // ── Protected routes — navbar shown, login required ──
   {
     element: <ProtectedLayout />,
     children: [
-      { path: "/", element: <Landing /> },
-      { path: "/home", element: <Landing /> },
+      { path: "/",         element: <Landing /> },
+      { path: "/home",     element: <Landing /> },
+      { path: "/browse",   element: <Browse /> },
+      { path: "/nearby",   element: <NearbyBooks /> },
       { path: "/add-book", element: <AddBook /> },
       { path: "/my-books", element: <MyBooks /> },
-      { path: "/nearby", element: <NearbyBooks /> },
-      { path: "/chats", element: <Chats /> },
-      { path: "/browse", element: <Browse /> },
+      { path: "/chats",    element: <Chats /> },
     ],
   },
 ]);
