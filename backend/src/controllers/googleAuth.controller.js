@@ -25,7 +25,8 @@ export const googleAuthCallback = async (req, res) => {
       process.env.FRONTEND_URL ||
       "http://localhost:5173";
     // Let the frontend verify the secure login cookie before entering the app.
-    res.redirect(`${clientURL}/auth/success`);
+    // res.redirect(`${clientURL}/auth/success`);
+    res.redirect("http://localhost:5173/")
   } catch (error) {
     res.status(500).json({
       success: false,
