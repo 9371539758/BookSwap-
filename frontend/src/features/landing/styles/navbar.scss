@@ -1,6 +1,7 @@
 // ─── NAVBAR STYLES ────────────────────────────────────────────────────────────
 // Fixed at top, hides on scroll-down, shows on scroll-up.
 // Uses glassmorphism effect on scroll.
+// Includes animated mobile hamburger menu.
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
@@ -23,17 +24,20 @@ $border: rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid $border;
   transition:
     transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 
-  // Hide when scrolling down
   &--hidden {
     transform: translateY(-100%);
   }
 
-  // Extra shadow when user has scrolled
   &--scrolled {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-    background: rgba(15, 15, 15, 0.9);
+    background: rgba(15, 15, 15, 0.92);
+  }
+
+  &--menu-open {
+    background: rgba(15, 15, 15, 0.98);
   }
 }
 
@@ -47,6 +51,12 @@ $border: rgba(255, 255, 255, 0.08);
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
+  position: relative;
+
+  @media (max-width: 768px) {
+    padding: 0 1.25rem;
+    gap: 1rem;
+  }
 }
 
 // ── Logo ───────────────────────────────────────────────────────────────────────
@@ -57,6 +67,7 @@ $border: rgba(255, 255, 255, 0.08);
   cursor: pointer;
   text-decoration: none;
   flex-shrink: 0;
+  z-index: 10;
 
   &:hover .navbar__logo-text {
     color: $accent;
@@ -73,10 +84,14 @@ $border: rgba(255, 255, 255, 0.08);
     letter-spacing: -0.3px;
     transition: color 0.2s;
     font-family: "Inter", sans-serif;
+
+    @media (max-width: 400px) {
+      font-size: 1.1rem;
+    }
   }
 }
 
-// ── Nav Links ──────────────────────────────────────────────────────────────────
+// ── Nav Links (Desktop) ────────────────────────────────────────────────────────
 .navbar__menu {
   display: flex;
   align-items: center;
@@ -86,7 +101,7 @@ $border: rgba(255, 255, 255, 0.08);
   padding: 0;
 
   @media (max-width: 768px) {
-    display: none; // hide on mobile for now
+    display: none;
   }
 }
 
@@ -101,9 +116,7 @@ $border: rgba(255, 255, 255, 0.08);
     font-size: 0.9rem;
     font-weight: 500;
     border-radius: 8px;
-    transition:
-      color 0.2s,
-      background 0.2s;
+    transition: color 0.2s, background 0.2s;
     font-family: "Inter", sans-serif;
     background: transparent;
     border: none;
@@ -116,12 +129,16 @@ $border: rgba(255, 255, 255, 0.08);
   }
 }
 
-// ── Auth Section ───────────────────────────────────────────────────────────────
+// ── Auth Section (Desktop) ─────────────────────────────────────────────────────
 .navbar__auth {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 }
 
 // ── User info (logged in) ──────────────────────────────────────────────────────
@@ -176,12 +193,38 @@ $border: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.06);
   color: $text-primary;
   cursor: pointer;
+  transition: background 0.2s;
 
-  &:hover { background: rgba(255, 255, 255, 0.12); }
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
 
-  svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
 
-  span { position: absolute; top: -6px; right: -8px; min-width: 18px; height: 18px; padding: 0 4px; display: grid; place-items: center; border: 2px solid $bg-dark; border-radius: 10px; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; }
+  span {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    display: grid;
+    place-items: center;
+    border: 2px solid $bg-dark;
+    border-radius: 10px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
 }
 
 // ── Buttons ────────────────────────────────────────────────────────────────────
@@ -196,7 +239,6 @@ $border: rgba(255, 255, 255, 0.08);
   font-family: "Inter", sans-serif;
   white-space: nowrap;
 
-  // Login button — ghost style
   &--login {
     background: transparent;
     color: $text-muted;
@@ -209,7 +251,6 @@ $border: rgba(255, 255, 255, 0.08);
     }
   }
 
-  // Sign Up button — filled accent
   &--signup {
     background: linear-gradient(135deg, $accent, #9c88ff);
     color: #fff;
@@ -220,7 +261,6 @@ $border: rgba(255, 255, 255, 0.08);
     }
   }
 
-  // Secondary actions (List Book, My Books)
   &--secondary {
     background: rgba(255, 255, 255, 0.06);
     color: $text-primary;
@@ -232,7 +272,6 @@ $border: rgba(255, 255, 255, 0.08);
     }
   }
 
-  // Logout — red tinted
   &--logout {
     background: rgba(255, 80, 80, 0.1);
     color: #ff6b6b;
@@ -242,4 +281,184 @@ $border: rgba(255, 255, 255, 0.08);
       background: rgba(255, 80, 80, 0.2);
     }
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── MOBILE HAMBURGER + MENU ───────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Hamburger Button ──────────────────────────────────────────────────────────
+.navbar__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid $border;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10000;                 // always on top of the menu
+  transition: background 0.2s, border-color 0.2s;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: $text-primary;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+  }
+
+  // When open → becomes X
+  &--open {
+    background: rgba(108, 99, 255, 0.15);
+    border-color: rgba(108, 99, 255, 0.4);
+
+    span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+  }
+}
+
+// ── Mobile Menu (Full screen + Animation) ─────────────────────────────────────
+.navbar__mobile-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: #0c0c0e;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  padding: 90px 1.5rem 2rem;
+  overflow: hidden;
+
+  // Closed state
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-20px);
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease,
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Open state
+  &--open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}
+
+.navbar__mobile-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.navbar__mobile-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1.05rem 1.2rem;
+  color: #f0f0f0 !important;
+  font-size: 1.15rem;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+  appearance: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+
+  &:active {
+    background: rgba(108, 99, 255, 0.18);
+    color: #a5a0ff !important;
+    transform: scale(0.98);
+  }
+}
+
+.navbar__mobile-badge {
+  margin-left: 10px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.navbar__mobile-auth {
+  margin-top: auto;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.navbar__mobile-user {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.4rem 0;
+}
+
+.navbar__mobile-auth .navbar__btn {
+  width: 100%;
+  padding: 0.95rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+// Prevent body scroll
+body.menu-open {
+  overflow: hidden !important;
+  height: 100vh;
+  height: 100dvh;
+}
+
+
+// Prevent body scroll + hide scrollbar when menu is open
+body.menu-open {
+  overflow: hidden !important;
+  height: 100vh;
+  height: 100dvh;
+}
+
+
+// Prevent body scroll when menu is open
+body.menu-open {
+  overflow: hidden;
 }
