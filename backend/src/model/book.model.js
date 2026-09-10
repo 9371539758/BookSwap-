@@ -49,12 +49,12 @@ const bookSchema = new mongoose.Schema(
     // ─── LOCATION ───────────────────────────────────────────────────────────────
     // Human-readable location (city, state) for display purposes
     location: {
-      city:  { type: String },
+      city: { type: String },
       state: { type: String },
 
       // Flat lat/lng kept for backward compatibility with existing data
       coordinates: {
-        latitude:  { type: Number },
+        latitude: { type: Number },
         longitude: { type: Number },
       },
 
@@ -66,9 +66,7 @@ const bookSchema = new mongoose.Schema(
           type: String,
           enum: ["Point"],
         },
-        coordinates: {
-          type: [Number], // [longitude, latitude]
-        },
+        coordinates: [Number], // [longitude, latitude]
       },
     },
 
@@ -80,14 +78,13 @@ const bookSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // ─── INDEXES ──────────────────────────────────────────────────────────────────
 bookSchema.index({ userId: 1 });
 bookSchema.index({ category: 1 });
 bookSchema.index({ "location.city": 1 });
-
 // 2dsphere index enables MongoDB geospatial queries ($geoNear, $near).
 // This is the key fix for accurate nearby-books distance calculation.
 bookSchema.index({ "location.geoPoint": "2dsphere" });
@@ -95,19 +92,41 @@ bookSchema.index({ "location.geoPoint": "2dsphere" });
 // ─── PRE-SAVE HOOK ────────────────────────────────────────────────────────────
 // Whenever a book is saved with flat latitude/longitude coordinates,
 // automatically populate the GeoJSON geoPoint field for geospatial queries.
-bookSchema.pre("save", function () {
-  const lat = this.location?.coordinates?.latitude;
-  const lng = this.location?.coordinates?.longitude;
+bookSchema.pre("save", function (next) {
+  try {
+    if (!this.location) {
+      this.location = {};
+    }
 
-  if (Number.isFinite(lat) && Number.isFinite(lng)) {
-    // GeoJSON coordinates order: [longitude, latitude]
-    this.location.geoPoint = {
-      type: "Point",
-      coordinates: [lng, lat],
-    };
+    const lat = Number(this.location?.coordinates?.latitude);
+    const lng = Number(this.location?.coordinates?.longitude);
+
+    if (
+      Number.isFinite(lat) &&
+      Number.isFinite(lng) &&
+      Math.abs(lat) <= 90 &&
+      Math.abs(lng) <= 180
+    ) {
+      this.location.geoPoint = {
+        type: "Point",
+        coordinates: [lng, lat],
+      };
+    } else {
+      this.location.geoPoint = undefined;
+    }
+  } catch (err) {
+    console.error("Error in pre-save hook:", err.message);
+    if (typeof next === "function") {
+      return next(err);
+    }
+    throw err;
   }
-});
 
+  if (typeof next === "function") {
+    return next();
+  }
+});qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 const Book = mongoose.model("Book", bookSchema);
 
 export default Book;
+qqq

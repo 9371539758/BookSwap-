@@ -28,14 +28,16 @@ const haversineKm = (fromLat, fromLng, toLat, toLng) => {
 // Books with NO location data at all are excluded from results.
 
 export const getNearbyBooks = async (req, res) => {
-  const latitude  = Number(req.query.latitude);
+  const latitude = Number(req.query.latitude);
   const longitude = Number(req.query.longitude);
-  const radiusKm  = Math.min(Number(req.query.radiusKm) || 50, 500); // cap at 500 km
+  const radiusKm = Math.min(Number(req.query.radiusKm) || 50, 500); // cap at 500 km
 
   // Validate incoming coordinates
   if (
-    !Number.isFinite(latitude)  || Math.abs(latitude)  > 90  ||
-    !Number.isFinite(longitude) || Math.abs(longitude) > 180
+    !Number.isFinite(latitude) ||
+    Math.abs(latitude) > 90 ||
+    !Number.isFinite(longitude) ||
+    Math.abs(longitude) > 180
   ) {
     return res.status(400).json({
       success: false,
@@ -54,32 +56,35 @@ export const getNearbyBooks = async (req, res) => {
             type: "Point",
             coordinates: [longitude, latitude], // GeoJSON: [lng, lat]
           },
-          distanceField: "distanceMeters",    // meters from user
-          maxDistance: radiusKm * 1000,       // convert km → meters
-          query: { available: true, "location.geoPoint": { $exists: true } },
-          spherical: true,                    // use spherical Earth model
+          distanceField: "distanceMeters", // meters from user
+          maxDistance: radiusKm * 1000, // convert km → meters
+          query: { available: true, "location.geoPoint": { $exists: true } }, // filters inside $geoNear
+          spherical: true, // use spherical Earth model
         },
       },
-      { $sort: { distanceMeters: 1 } },      // nearest first
+      { $sort: { distanceMeters: 1 } }, // nearest first
       { $limit: 100 },
       {
-        $lookup: {                            // join User data
+        $lookup: {
+          // join User data
           from: "users",
           localField: "userId",
           foreignField: "_id",
           as: "userId",
           pipeline: [
-            { $project: { username: 1, fullName: 1, location: 1 } },
+            { $project: { username: 1, fullName: 1, location: 1, _id: 1 } },
           ],
         },
       },
-      { $unwind: { path: "$userId", preserveNullAndEmpty: true } },
+      { $unwind: { path: "$userId", preserveNullAndEmptyArrays: true } },
     ]);
 
     // Convert distanceMeters → distanceKm, round to 1 decimal
     const geoBooks = geoResults.map((book) => ({
       ...book,
-      distanceKm: Number((book.distanceMeters / 1000).toFixed(1)),
+      distanceKm: book.distanceMeters
+        ? Number((book.distanceMeters / 1000).toFixed(1))
+        : null,
     }));
 
     // ── Strategy 2: Haversine fallback for books without geoPoint ────────────
@@ -88,8 +93,8 @@ export const getNearbyBooks = async (req, res) => {
 
     const legacyBooks = await Book.find({
       available: true,
-      "location.geoPoint": { $exists: false },      // not handled by geoNear
-      "location.coordinates.latitude":  { $exists: true },
+      "location.geoPoint": { $exists: false }, // not handled by geoNear
+      "location.coordinates.latitude": { $exists: true },
       "location.coordinates.longitude": { $exists: true },
     })
       .populate("userId", "username fullName location")
@@ -99,9 +104,10 @@ export const getNearbyBooks = async (req, res) => {
       .filter((b) => !geoBookIds.has(String(b._id))) // avoid duplicates
       .map((b) => {
         const distKm = haversineKm(
-          latitude, longitude,
+          latitude,
+          longitude,
           b.location.coordinates.latitude,
-          b.location.coordinates.longitude
+          b.location.coordinates.longitude,
         );
         return { ...b, distanceKm: Number(distKm.toFixed(1)) };
       })
@@ -109,7 +115,7 @@ export const getNearbyBooks = async (req, res) => {
 
     // ── Merge & sort ──────────────────────────────────────────────────────────
     const all = [...geoBooks, ...legacyNearby].sort(
-      (a, b) => a.distanceKm - b.distanceKm
+      (a, b) => a.distanceKm - b.distanceKm,
     );
 
     return res.json({
@@ -118,10 +124,12 @@ export const getNearbyBooks = async (req, res) => {
       data: all,
     });
   } catch (error) {
-    console.error("Nearby books error:", error.message);
+    console.error("Nearby books error:", error);
+    console.error("Error message:", error.message);
     return res.status(500).json({
       success: false,
       message: "Could not find nearby books",
+      error: error.message,
     });
   }
 };
@@ -130,19 +138,28 @@ export const getNearbyBooks = async (req, res) => {
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await Book.findById(id).populate("userId", "username fullName email");
+    const book = await Book.findById(id).populate(
+      "userId",
+      "username fullName email",
+    );
 
     if (!book) {
-      return res.status(404).json({ success: false, message: "Book not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Book not found" });
     }
 
     return res.status(200).json({ success: true, data: book });
   } catch (error) {
     if (error.name === "CastError") {
-      return res.status(400).json({ success: false, message: "Invalid book ID" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid book ID" });
     }
     console.error("Get book by ID error:", error.message);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };
 
@@ -150,12 +167,24 @@ export const getBookById = async (req, res) => {
 export const addBook = async (req, res) => {
   try {
     if (!req.user?.id) {
-      return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
+      return res
+        .status(401)
+        .json({ success: false, message: "Unauthorized. Please log in." });
     }
 
     const {
-      title, author, isbn, category, condition, description,
-      language, publicationYear, coverImage, location, price, available,
+      title,
+      author,
+      isbn,
+      category,
+      condition,
+      description,
+      language,
+      publicationYear,
+      coverImage,
+      location,
+      price,
+      available,
     } = req.body;
 
     // Prevent duplicate ISBN per user
@@ -171,10 +200,51 @@ export const addBook = async (req, res) => {
 
     const newBook = new Book({
       userId: req.user.id,
-      title, author, isbn, category, condition, description,
-      language, publicationYear, coverImage, location,
-      price, available: available ?? true,
+      title,
+      author,
+      isbn,
+      category,
+      condition,
+      description,
+      language,
+      publicationYear,
+      coverImage,
+      price,
+      available: available ?? true,
     });
+
+    // Only add location if it has meaningful data.
+    // Also create the GeoJSON point immediately so nearby queries can use it
+    // even before a save hook has a chance to run in custom/test contexts.
+    if (
+      location &&
+      (location.city ||
+        location.state ||
+        location.coordinates?.latitude != null ||
+        location.coordinates?.longitude != null)
+    ) {
+      const lat = Number(location.coordinates?.latitude);
+      const lng = Number(location.coordinates?.longitude);
+
+      newBook.location = {
+        city: location.city || undefined,
+        state: location.state || undefined,
+        coordinates:
+          Number.isFinite(lat) && Number.isFinite(lng)
+            ? {
+                latitude: lat,
+                longitude: lng,
+              }
+            : undefined,
+      };
+
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        newBook.location.geoPoint = {
+          type: "Point",
+          coordinates: [lng, lat],
+        };
+      }
+    }
 
     const savedBook = await newBook.save();
 
@@ -193,8 +263,13 @@ export const addBook = async (req, res) => {
           : [error.message],
       });
     }
-    console.error("Add book error:", error.message);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    console.error("Add book error:", error);
+    console.error("Error details:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 };
 
@@ -216,7 +291,9 @@ export const getMyBooks = async (req, res) => {
     });
   } catch (error) {
     console.error("Get my books error:", error.message);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };
 
@@ -231,23 +308,34 @@ export const deleteBook = async (req, res) => {
     const book = await Book.findById(id);
 
     if (!book) {
-      return res.status(404).json({ success: false, message: "Book not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Book not found" });
     }
 
     // Only the owner can delete their book
     if (book.userId.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: "Not authorized to delete this book" });
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this book",
+      });
     }
 
     await book.deleteOne();
 
-    return res.status(200).json({ success: true, message: "Book deleted successfully" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Book deleted successfully" });
   } catch (error) {
     if (error.name === "CastError") {
-      return res.status(400).json({ success: false, message: "Invalid book ID" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid book ID" });
     }
     console.error("Delete book error:", error.message);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };
 
@@ -258,13 +346,13 @@ export const getAllBooks = async (req, res) => {
     const { category, condition, search, page = 1, limit = 20 } = req.query;
     const filter = {};
 
-    if (category)  filter.category  = category;
+    if (category) filter.category = category;
     if (condition) filter.condition = condition;
     if (search) {
       filter.$or = [
-        { title:  { $regex: search, $options: "i" } },
+        { title: { $regex: search, $options: "i" } },
         { author: { $regex: search, $options: "i" } },
-        { isbn:   { $regex: search, $options: "i" } },
+        { isbn: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -293,6 +381,8 @@ export const getAllBooks = async (req, res) => {
     });
   } catch (error) {
     console.error("Get all books error:", error.message);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };

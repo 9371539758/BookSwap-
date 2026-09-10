@@ -13,38 +13,42 @@ import { Message } from "../model/message.model.js";
 const populateConnection = (query) =>
   query
     .populate("fromUser", "username fullName avatar")
-    .populate("toUser",   "username fullName avatar")
-    .populate("bookId",   "title coverImage")
+    .populate("toUser", "username fullName avatar")
+    .populate("bookId", "title coverImage")
     .lean(); // .lean() returns plain objects — faster than Mongoose documents
 
 export const getConnections = async (req, res) => {
   try {
-    const userId = req.user.id; // set by authMiddleware from JWT cookie
+    const userId = req.user.id;
 
-    // Run all three queries in parallel for speed
     const [incoming, outgoing, accepted] = await Promise.all([
-      // Requests where I am the recipient and haven't decided yet
       populateConnection(
-        Connection.find({ toUser: userId, status: "pending" }).sort({ createdAt: -1 })
+        Connection.find({
+          toUser: userId,
+          status: "pending",
+        }).sort({ createdAt: -1 }),
       ),
-      // Requests I sent that are still pending
       populateConnection(
-        Connection.find({ fromUser: userId, status: "pending" }).sort({ createdAt: -1 })
+        Connection.find({
+          fromUser: userId,
+          status: "pending",
+        }).sort({ createdAt: -1 }),
       ),
-      // Chats I am part of (either as sender or receiver) — accepted only
-      // PRIVACY: $or ensures only the two participants can see this chat
       populateConnection(
         Connection.find({
           $or: [{ fromUser: userId }, { toUser: userId }],
           status: "accepted",
-        }).sort({ updatedAt: -1 })
+          hiddenFor: { $ne: userId },
+        }).sort({ updatedAt: -1 }),
       ),
     ]);
 
     return res.json({ success: true, data: { incoming, outgoing, accepted } });
   } catch (error) {
     console.error("getConnections error:", error.message);
-    return res.status(500).json({ success: false, message: "Could not load chats" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Could not load chats" });
   }
 };
 
@@ -60,21 +64,21 @@ export const getConnections = async (req, res) => {
 export const getMessages = async (req, res) => {
   try {
     const { connectionId } = req.params;
-    const userId = req.user.id; // verified JWT user — set by authMiddleware
+    const userId = req.user.id;
 
-    // Verify: connection must be accepted AND user must be a participant
     const connection = await Connection.findOne({
       _id: connectionId,
       status: "accepted",
-      $or: [{ fromUser: userId }, { toUser: userId }], // PRIVACY CHECK
+      $or: [{ fromUser: userId }, { toUser: userId }],
+      hiddenFor: { $ne: userId },
     });
 
     if (!connection) {
-      // Don't reveal whether the chat exists — just say not available
-      return res.status(404).json({ success: false, message: "Chat not found or access denied" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Chat not found or access denied" });
     }
 
-    // Load messages in chronological order (oldest first for chat display)
     const messages = await Message.find({ connectionId })
       .populate("sender", "username fullName avatar")
       .sort({ createdAt: 1 })
@@ -84,5 +88,40 @@ export const getMessages = async (req, res) => {
   } catch (error) {
     console.error("getMessages error:", error.message);
     return res.status(400).json({ success: false, message: "Invalid chat" });
+  }
+};
+
+export const deleteConnectionForUser = async (req, res) => {
+  try {
+    const { connectionId } = req.params;
+    const userId = req.user.id;
+
+    const connection = await Connection.findOne({
+      _id: connectionId,
+      status: "accepted",
+      $or: [{ fromUser: userId }, { toUser: userId }],
+    });
+
+    if (!connection) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Chat not found or access denied" });
+    }
+
+    if (!connection.hiddenFor.some((id) => id.toString() === userId)) {
+      connection.hiddenFor.push(userId);
+      await connection.save();
+    }
+
+    return res.json({
+      success: true,
+      message: "Chat hidden for you",
+      data: { connectionId: connection._id },
+    });
+  } catch (error) {
+    console.error("deleteConnectionForUser error:", error.message);
+    return res
+      .status(400)
+      .json({ success: false, message: "Could not hide chat" });
   }
 };

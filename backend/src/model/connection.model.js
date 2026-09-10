@@ -22,8 +22,15 @@ const connectionSchema = new mongoose.Schema(
       enum: ["pending", "accepted", "rejected"],
       default: "pending",
     },
+    hiddenFor: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // One pending/accepted request per pair (optional uniqueness)
